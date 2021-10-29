@@ -1,0 +1,51 @@
+{
+    "name": "beebmx/laravel-pay",
+    "description": "Create payments with Laravel",
+    "keywords": ["laravel", "stripe", "conekta", "payment", "payments", "laravel-pay", "laravel-payment", "laravel-payments"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fernando Gutierrez",
+            "email": "fernando@beeb.mx"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "illuminate/database": "^8.60",
+        "illuminate/support": "^8.60",
+        "illuminate/view": "^8.60"
+    },
+    "require-dev": {
+        "conekta/conekta-php": "^4.3",
+        "mockery/mockery": "^1.4",
+        "orchestra/testbench": "^6.20",
+        "phpunit/phpunit": "^9.5",
+        "stripe/stripe-php": "^7.95"
+    },
+    "autoload": {
+        "psr-4": {
+            "Beebmx\\LaravelPay\\": "src/",
+            "Beebmx\\LaravelPay\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Beebmx\\LaravelPay\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit --no-coverage"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Beebmx\\LaravelPay\\PayServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

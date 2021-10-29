@@ -1,0 +1,145 @@
+<?php
+
+namespace Beebmx\LaravelPay\Tests\Feature;
+
+use Beebmx\LaravelPay\Address;
+use Beebmx\LaravelPay\Elements\Customer;
+use Beebmx\LaravelPay\Elements\PaymentMethod;
+use Beebmx\LaravelPay\Tests\FeatureTestCase;
+use Beebmx\LaravelPay\Tests\Fixtures\User;
+use Beebmx\LaravelPay\Transaction;
+use Beebmx\LaravelPay\TransactionItem;
+
+class StripeTest extends FeatureTestCase
+{
+    /** @test */
+    public function a_customer_can_be_created()
+    {
+        $user = User::factory()->create();
+
+        $customer = $user->createCustomerWithDriver();
+
+        $this->assertNotNull($user->service);
+        $this->assertEquals('stripe', $user->service);
+        $this->assertNotNull($user->service_customer_id);
+        $this->assertIsObject($customer);
+    }
+
+    /** @test */
+    public function a_customer_can_be_requested_as_customer_driver()
+    {
+        $user = User::factory()->create();
+        $user->createCustomerWithDriver();
+        $customer = $user->fresh()->asCustomer();
+
+        $this->assertInstanceOf(Customer::class, $customer);
+        $this->assertIsObject($customer);
+    }
+
+    /** @test */
+    public function a_customer_can_add_a_payment_method()
+    {
+        $user = User::factory()->create();
+        $user->createCustomerWithDriver();
+
+        $paymentMethod = $user->addPaymentMethod('pm_card_visa');
+
+        $this->assertIsObject($paymentMethod);
+    }
+
+    /** @test */
+    public function a_customer_can_retrive_their_default_payment_method()
+    {
+        $user = User::factory()->create();
+        $user->createCustomerWithDriver();
+        $user->addPaymentMethod('pm_card_visa');
+
+        $paymentMethod = $user->getDefaultPayment();
+        $user = $user->fresh();
+
+        $this->assertNotNull($paymentMethod);
+        $this->assertIsObject($paymentMethod);
+        $this->assertInstanceOf(PaymentMethod::class, $paymentMethod);
+        $this->assertEquals($user->service_payment_id, $paymentMethod->id);
+    }
+
+    /** @test */
+    public function a_charge_save_the_transaction_and_items()
+    {
+        $user = User::factory()->create();
+        $user->createCustomerWithDriver();
+        $user->addPaymentMethod('pm_card_visa');
+
+        $this->assertCount(0, Transaction::all());
+        $this->assertCount(0, TransactionItem::all());
+
+        $user->charge([[
+            'name' => 'Product 01',
+            'price' => 100
+        ], [
+            'name' => 'Product 02',
+            'price' => 200
+        ]]);
+
+        $this->assertCount(1, Transaction::all());
+        $this->assertCount(2, TransactionItem::all());
+    }
+
+    /** @test */
+    public function a_charge_save_the_address()
+    {
+        $user = User::factory()->create();
+        $address = Address::factory()->for($user)->create();
+        $user->createCustomerWithDriver();
+        $user->addPaymentMethod('pm_card_visa');
+
+        $payment = $user
+            ->shipping($address)
+            ->charge(['name' => 'Product 01', 'price' => 500]);
+
+        $this->assertArrayHasKey('shipping', $payment->asDriver());
+        $this->assertNotNull($payment->asDriver()->shipping);
+    }
+
+    /** @test */
+    public function a_user_can_create_a_charge_with_one_time_payment_method()
+    {
+        $user = User::factory()->create();
+        $user->createCustomerWithDriver();
+
+        $this->assertCount(0, Transaction::all());
+
+        $user
+            ->token('tok_visa')
+            ->charge([
+                'name' => 'Testing product',
+                'price' => 500,
+            ]);
+
+        $this->assertCount(1, Transaction::all());
+    }
+
+    /** @test */
+    public function an_anonymous_user_can_create_a_charge_with_one_time_payment_method()
+    {
+        $user = User::factory()->create();
+
+        $this->assertCount(0, Transaction::all());
+
+        $user
+            ->token('tok_visa')
+            ->charge([
+                'name' => 'Testing product',
+                'price' => 500,
+            ]);
+
+        $this->assertCount(1, Transaction::all());
+    }
+
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+        $app['config']->set('pay.default', 'stripe');
+        $app['config']->set('pay.currency', 'mxn');
+    }
+}
