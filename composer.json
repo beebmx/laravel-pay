@@ -11,9 +11,10 @@
     ],
     "require": {
         "php": "^8.0",
-        "illuminate/database": "^8.60",
-        "illuminate/support": "^8.60",
-        "illuminate/view": "^8.60"
+        "guzzlehttp/guzzle": "^7.4",
+        "illuminate/database": "^8.77",
+        "illuminate/support": "^8.77",
+        "illuminate/view": "^8.77"
     },
     "require-dev": {
         "conekta/conekta-php": "^4.3",

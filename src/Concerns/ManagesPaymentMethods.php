@@ -6,7 +6,9 @@ use Beebmx\LaravelPay\Elements\PaymentMethod;
 
 trait ManagesPaymentMethods
 {
-    protected ?PaymentMethod $oneTimePaymentMethod = null;
+    protected ?PaymentMethod $oneTimeTokenPaymentMethod = null;
+
+    protected ?PaymentMethod $oxxoPaymentMethod = null;
 
     public function hasDefaultPayment(): bool
     {
@@ -44,19 +46,41 @@ trait ManagesPaymentMethods
 
     public function token(string $token): static
     {
-        $this->oneTimePaymentMethod = new PaymentMethod($this, $this->driver()->token($token));
+        $this->oneTimeTokenPaymentMethod = new PaymentMethod($this, $this->driver()->token($token));
+
+        return $this;
+    }
+
+    public function oxxo(): static
+    {
+        $this->oxxoPaymentMethod = new PaymentMethod($this, $this->driver()->oxxo($this));
 
         return $this;
     }
 
     public function hasOneTimePaymentMethod(): bool
     {
-        return !is_null($this->oneTimePaymentMethod);
+        return !is_null($this->oneTimeTokenPaymentMethod) || !is_null($this->oxxoPaymentMethod);
     }
 
-    public function getOneTimePaymentMethod(): ?PaymentMethod
+    public function hasOneTimeTokenPaymentMethod(): bool
     {
-        return $this->oneTimePaymentMethod;
+        return !is_null($this->oneTimeTokenPaymentMethod);
+    }
+
+    public function hasOxxoPaymentMethod(): bool
+    {
+        return !is_null($this->oxxoPaymentMethod);
+    }
+
+    public function getOneTimeTokenPaymentMethod(): ?PaymentMethod
+    {
+        return $this->oneTimeTokenPaymentMethod;
+    }
+
+    public function getOxxoPaymentMethod(): ?PaymentMethod
+    {
+        return $this->oxxoPaymentMethod;
     }
 
     protected function fillPaymentMethodFields($paymentMethod)

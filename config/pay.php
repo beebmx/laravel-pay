@@ -21,21 +21,39 @@ return [
 
         'stripe' => [
             'driver' => Beebmx\LaravelPay\Drivers\StripeDriver::class,
-            'webhooks' => null,
             'secret' => env('STRIPE_SECRET_KEY'),
             'public' => env('STRIPE_PUBLIC_KEY'),
+            'webhooks' => [
+                'events' => [
+                    'customer.subscription.created',
+                    'customer.subscription.updated',
+                    'customer.subscription.deleted',
+                    'customer.updated',
+                    'customer.deleted',
+                    'invoice.payment_action_required',
+                ]
+            ],
         ],
 
         'conekta' => [
             'driver' => Beebmx\LaravelPay\Drivers\ConektaDriver::class,
-            'webhooks' => null,
             'secret' => env('CONEKTA_SECRET_KEY'),
             'public' => env('CONEKTA_PUBLIC_KEY'),
-            'days_to_expire' => env('CONEKTA_OXXO_EXPIRES_AT', 2),
+            'webhooks' => [
+
+            ],
         ],
     ],
 
     'locale' => 'en',
+
+    'path' => env('PAY_PATH', 'pay'),
+
+    'webhooks' => env('PAY_WEBHOOKS_PATH', 'webhooks'),
+
+    'oxxo' => [
+        'days_to_expire' => env('CONEKTA_OXXO_EXPIRES_AT', 30),
+    ],
 
 
     /*

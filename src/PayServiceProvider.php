@@ -2,6 +2,7 @@
 
 namespace Beebmx\LaravelPay;
 
+use Beebmx\LaravelPay\Console\Webhook as WebhookCommand;
 use Illuminate\Support\ServiceProvider;
 
 class PayServiceProvider extends ServiceProvider
@@ -10,6 +11,7 @@ class PayServiceProvider extends ServiceProvider
     {
         $this->registerMigrations();
         $this->registerPublishing();
+        $this->registerCommands();
     }
 
     public function register()
@@ -61,6 +63,15 @@ class PayServiceProvider extends ServiceProvider
 //            $this->publishes([
 //                __DIR__.'/../resources/views' => $this->app->resourcePath('views/vendor/cashier'),
 //            ], 'pay-views');
+        }
+    }
+
+    protected function registerCommands()
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                WebhookCommand::class,
+            ]);
         }
     }
 }

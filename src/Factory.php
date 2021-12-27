@@ -11,9 +11,11 @@ class Factory
      * @throws DriverNonInstantiable
      * @throws InvalidDriver
      */
-    public static function make()
+    public static function make(string $service = null)
     {
-        $service = self::getService();
+        $service = is_null($service)
+            ? self::getService()
+            : self::getServiceByName($service);
 
         if (! self::isInstantiable($service)) {
             throw DriverNonInstantiable::invalid($service);
@@ -21,6 +23,7 @@ class Factory
 
         return $service;
     }
+
     /**
      * @throws InvalidDriver
      */
@@ -31,6 +34,18 @@ class Factory
         }
 
         return static::getDrivers()[static::getDefaultService()]['driver'] ?? null;
+    }
+
+    /**
+     * @throws InvalidDriver
+     */
+    public static function getServiceByName(string $service)
+    {
+        if (! array_key_exists($service, static::getDrivers())) {
+            throw InvalidDriver::exists($service);
+        }
+
+        return static::getDrivers()[$service]['driver'] ?? null;
     }
 
     public static function getDriversClasses(): array

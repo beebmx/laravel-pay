@@ -26,9 +26,11 @@ trait PerformsPayments
             throw InvalidPayment::product();
         }
 
-        if ($this->hasOneTimePaymentMethod()) {
-            $paymentMethod = $this->getOneTimePaymentMethod();
-        }
+        $paymentMethod = match(true) {
+            $this->hasOneTimeTokenPaymentMethod() => $this->getOneTimeTokenPaymentMethod(),
+            $this->hasOxxoPaymentMethod() => $this->getOxxoPaymentMethod(),
+            default => $paymentMethod
+        };
 
         if (!$paymentMethod && !$this->hasDefaultPayment()) {
             throw InvalidPaymentMethod::exists();
@@ -46,7 +48,6 @@ trait PerformsPayments
             ? $this->asAnonymousCustomer()
             : $this->asCustomer();
 
-
         $payment = $this->driver()->charge(
             $customer,
             $paymentMethod,
@@ -55,10 +56,11 @@ trait PerformsPayments
             $options
         );
 
+
         $transaction = $this->transactions()->create([
             'service' => $this->driver()->name(),
-            'service_id' => $paymentMethod->id ?? $paymentMethod->token,
-            'service_type' => $paymentMethod->type,
+            'service_id' => $this->getPaymentMethodId($paymentMethod, $payment),
+            'service_type' => $paymentMethod->type ?? $payment->type,
             'service_payment_id' => $payment->id,
             'amount' => $payment->amount,
             'currency' => $payment->currency,
@@ -111,5 +113,15 @@ trait PerformsPayments
         }
 
         return $this->getDefaultPayment();
+    }
+
+    public function getPaymentMethodId(PaymentMethod $paymentMethod, $payment = null)
+    {
+        return match(true) {
+            !is_null($paymentMethod->id) => $paymentMethod->id,
+            !is_null($paymentMethod->token) => $paymentMethod->token,
+            !is_null($payment->oxxo_reference) => $payment->oxxo_reference,
+            !is_null($payment->oxxo_secret) => $payment->oxxo_secret
+        };
     }
 }

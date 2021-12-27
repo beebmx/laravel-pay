@@ -35,6 +35,12 @@ interface Driverable
 
     public function parsePrice($amount): float;
 
+    public function webhook(string $url): void;
+
+    public function webhookList(string $url): array;
+
+    public function webhookDestroy(string $url): void;
+
     public static function getPaymentType($paymentMethod);
 
     public static function getPaymentBrand($paymentMethod);

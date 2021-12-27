@@ -101,7 +101,7 @@ class ConektaTest extends FeatureTestCase
     }
 
     /** @test */
-    public function a_user_can_create_a_charge_with_one_time_payment_method()
+    public function a_user_can_create_a_charge_with_one_time_token_payment_method()
     {
         $user = User::factory()->create();
         $user->createCustomerWithDriver();
@@ -119,7 +119,7 @@ class ConektaTest extends FeatureTestCase
     }
 
     /** @test */
-    public function an_anonymous_user_can_create_a_charge_with_one_time_payment_method()
+    public function an_anonymous_user_can_create_a_charge_with_one_time_token_payment_method()
     {
         $user = User::factory()->create();
         $user->phone = '+520000000000';
@@ -136,10 +136,48 @@ class ConektaTest extends FeatureTestCase
         $this->assertCount(1, Transaction::all());
     }
 
+    /** @test */
+    public function a_user_can_create_a_charge_with_oxxo_payment_method()
+    {
+        $user = User::factory()->create();
+        $user->createCustomerWithDriver();
+        $user->phone = '+520000000000';
+
+        $this->assertCount(0, Transaction::all());
+
+        $user
+            ->oxxo()
+            ->charge([
+                'name' => 'Testing product',
+                'price' => 500,
+            ]);
+
+        $this->assertCount(1, Transaction::all());
+    }
+
+    /** @test */
+    public function an_anonymous_user_can_create_a_charge_with_oxxo_payment_method()
+    {
+        $user = User::factory()->create();
+        $user->phone = '+520000000000';
+
+        $this->assertCount(0, Transaction::all());
+
+        $user
+            ->oxxo()
+            ->charge([
+                'name' => 'Testing product',
+                'price' => 500,
+            ]);
+
+        $this->assertCount(1, Transaction::all());
+    }
+
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
         $app['config']->set('pay.default', 'conekta');
         $app['config']->set('pay.currency', 'mxn');
+        $app['config']->set('pay.oxxo.days_to_expire', 1);
     }
 }

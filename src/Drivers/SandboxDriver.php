@@ -4,6 +4,7 @@ namespace Beebmx\LaravelPay\Drivers;
 
 use Beebmx\LaravelPay\Elements\Customer;
 use Beebmx\LaravelPay\Elements\PaymentMethod;
+use Beebmx\LaravelPay\Exceptions\WebhookUnavailable;
 use Beebmx\LaravelPay\Pay;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -66,12 +67,48 @@ class SandboxDriver extends Driver
         ];
     }
 
+    public function oxxo($user): object
+    {
+        return (object) [
+            'type' => 'oxxo',
+            'name' => null,
+            'exp_month' => null,
+            'exp_year' => null,
+            'last4' => null,
+            'parent_id' => null,
+        ];
+    }
+
     public function charge(Customer $customer, PaymentMethod $paymentMethod, array $products, $address = null, $options = []): object
     {
         return (object) array_merge(
             $this->preparePayment($customer->asDriver(), $paymentMethod->asDriver(), $products),
             $this->prepareShipping($address),
         );
+    }
+
+    /**
+     * @throws WebhookUnavailable
+     */
+    public function webhook(string $url): void
+    {
+        throw WebhookUnavailable::exists(static::DRIVER_NAME);
+    }
+
+    /**
+     * @throws WebhookUnavailable
+     */
+    public function webhookList(string $url): array
+    {
+        throw WebhookUnavailable::list(static::DRIVER_NAME);
+    }
+
+    /**
+     * @throws WebhookUnavailable
+     */
+    public function webhookDestroy(string $url): void
+    {
+        throw WebhookUnavailable::destroy(static::DRIVER_NAME);
     }
 
     public static function getPaymentType($paymentMethod)
@@ -211,6 +248,7 @@ class SandboxDriver extends Driver
                     ]
                 ]]
             ],
+            'oxxo_reference' => Str::random(14),
         ];
     }
 

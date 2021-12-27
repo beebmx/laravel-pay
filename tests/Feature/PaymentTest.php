@@ -149,4 +149,21 @@ class PaymentTest extends FeatureTestCase
 
         $this->assertCount(1, Transaction::all());
     }
+
+    /** @test */
+    public function a_user_can_create_a_charge_with_oxxo_payment()
+    {
+        $user = User::factory()->create();
+
+        $this->assertCount(0, Transaction::all());
+
+        $user
+            ->oxxo()
+            ->charge([
+                'name' => 'Testing product',
+                'price' => 500,
+            ]);
+
+        $this->assertCount(1, Transaction::all());
+    }
 }

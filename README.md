@@ -10,7 +10,8 @@ Laravel Pay
 1. 
 ---
 
-Laravel Pay description.
+Laravel Pay is inspired by the official `Laravel Cashier`.
+The approach is slightly different to `Cashier` and the main behavior is the payment transactions. 
 
 ## Installation
 

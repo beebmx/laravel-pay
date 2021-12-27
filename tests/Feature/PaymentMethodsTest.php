@@ -67,12 +67,22 @@ class PaymentMethodsTest extends FeatureTestCase
     }
 
     /** @test */
-    public function a_one_time_payment_method_is_returned_if_exists()
+    public function an_one_time_token_payment_method_is_returned_if_exists()
     {
         $user = new User;
-        $this->assertNull($user->getOneTimePaymentMethod());
+        $this->assertNull($user->getOneTimeTokenPaymentMethod());
 
         $user->token('token_123');
-        $this->assertInstanceOf(PaymentMethod::class, $user->getOneTimePaymentMethod());
+        $this->assertInstanceOf(PaymentMethod::class, $user->getOneTimeTokenPaymentMethod());
+    }
+
+    /** @test */
+    public function an_oxxo_payment_method_is_returned_if_exists()
+    {
+        $user = new User;
+        $this->assertNull($user->getOxxoPaymentMethod());
+
+        $user->oxxo();
+        $this->assertInstanceOf(PaymentMethod::class, $user->getOxxoPaymentMethod());
     }
 }

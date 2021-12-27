@@ -7,7 +7,9 @@ use Beebmx\LaravelPay\Elements\PaymentMethod;
 use Conekta\Conekta;
 use Conekta\Customer;
 use Conekta\Order;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
 
 class ConektaDriver extends Driver
 {
@@ -20,6 +22,7 @@ class ConektaDriver extends Driver
     public static function urls(): array
     {
         return [
+            'api' => 'https://api.conekta.io',
             'customers' => null,
             'logs' => null,
             'order' => null,
@@ -69,6 +72,16 @@ class ConektaDriver extends Driver
         ];
     }
 
+    public function oxxo($user): object
+    {
+        return (object) [
+            'type' => 'oxxo_cash',
+            'expires_at' => Carbon::now()
+                                ->addDays((int) config('pay.oxxo.days_to_expire'))
+                                ->timestamp
+        ];
+    }
+
     public function charge(PayCustomer $customer, PaymentMethod $paymentMethod, array $products, $address = null, $options = []): object
     {
         return tap(Order::create(array_merge(
@@ -81,9 +94,52 @@ class ConektaDriver extends Driver
             $this->prepareCustomer($customer),
             $this->prepareItems($products),
             $this->prepareShipping($address),
-        )), function ($order) {
+        )), function ($order) use ($paymentMethod) {
             $order->status = $order->payment_status;
+
+            if ($paymentMethod->type === 'oxxo_cash') {
+                $order->oxxo_reference = $order->charges[0]['payment_method']['reference'];
+            }
         });
+    }
+
+    public function webhook(string $url): void
+    {
+        Http::withHeaders([
+            'Accept' => 'application/vnd.conekta-v2.0.0+json',
+            'Authorization' => $this->getAuthorization(),
+            'Content-Type' => 'application/json',
+        ])->post("{$this->getApiUrl()}/webhooks", [
+            'url' => $url,
+            'synchronous' => false,
+        ]);
+    }
+
+    public function webhookList(string $url): array
+    {
+        return $this->getWebhooksList($url)
+            ->map(fn($webhook) => [
+                'id' => $webhook['id'],
+                'status' => $webhook['status'],
+                'url' => $webhook['url'],
+                'production' => $webhook['production_enabled'] ? '✅' : '❎'
+            ])->toArray();
+    }
+
+    public function webhookDestroy(string $url): void
+    {
+        $this->getWebhooksList($url)
+            ->filter(fn($webhook) => $webhook['url'] === $url)
+            ->each(function($webhook) use ($url) {
+                Http::withHeaders([
+                    'Accept' => 'application/vnd.conekta-v2.0.0+json',
+                    'Authorization' => $this->getAuthorization(),
+                    'Content-Type' => 'application/json',
+                ])->delete("{$this->getApiUrl()}/webhooks/{$webhook['id']}", [
+                    'url' => $url,
+                    'synchronous' => false,
+                ]);
+            });
     }
 
     protected function prepareCustomer($customer): array
@@ -178,6 +234,30 @@ class ConektaDriver extends Driver
 
     protected function isPaymentMethodMerge($paymentMethod): bool
     {
-        return $paymentMethod->token_id !== null;
+        return $paymentMethod->token_id !== null || $paymentMethod->type === 'oxxo_cash';
+    }
+
+    protected function getApiUrl(): string
+    {
+        return static::urls()['api'];
+    }
+
+    protected function getAuthorization(): string
+    {
+        return 'Basic ' . base64_encode(config('pay.drivers.conekta.secret'));
+    }
+
+    protected function getWebhooksList($url): Collection
+    {
+        $response =  Http::withHeaders([
+            'Accept' => 'application/vnd.conekta-v2.0.0+json',
+            'Authorization' => $this->getAuthorization(),
+            'Content-Type' => 'application/json',
+        ])->get("{$this->getApiUrl()}/webhooks", [
+            'url' => $url,
+            'synchronous' => false,
+        ]);
+
+        return Collection::make($response->json()['data']);
     }
 }

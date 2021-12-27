@@ -5,6 +5,7 @@ namespace Beebmx\LaravelPay\Drivers;
 use Beebmx\LaravelPay\Elements\Customer as PayCustomer;
 use Beebmx\LaravelPay\Elements\PaymentMethod;
 use Beebmx\LaravelPay\Pay;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Stripe\Stripe;
 use Stripe\StripeClient;
@@ -90,6 +91,18 @@ class StripeDriver extends Driver
         ]);
     }
 
+    public function oxxo(): object
+    {
+        return (object) [
+            'payment_method_types' => ['oxxo'],
+            'payment_method_options' => [
+                'oxxo' =>[
+                    'expires_after_days' => (int) config('pay.oxxo.days_to_expire')
+                ]
+            ]
+        ];
+    }
+
     public function charge(PayCustomer $customer, PaymentMethod $paymentMethod, array $products, $address = null, $options = []): object
     {
         return tap($this->stripe()->paymentIntents->create(array_merge(
@@ -97,16 +110,45 @@ class StripeDriver extends Driver
                 'amount' => $this->preparePrice(
                     $this->getProductsAmount($products)
                 ),
-                'payment_method' => $paymentMethod->id,
-                'confirm' => true,
-                'confirmation_method' => 'automatic',
                 'currency' => config('pay.currency'),
             ],
+            $this->preparePaymentMethod($paymentMethod),
             $this->prepareCustomer($customer),
             $this->prepareShipping($address, $customer),
         )), function ($order) {
-            // Extra data
+            if ($this->isAnOxxoOrder($order)) {
+                $order->oxxo_secret = $order->client_secret;
+                $order->type = 'oxxo';
+            }
         });
+    }
+
+    public function webhook(string $url): void
+    {
+        $this->stripe()->webhookEndpoints->create([
+            'url' => $url,
+            'enabled_events' => config('pay.drivers.stripe.webhooks.events'),
+        ]);
+    }
+
+    public function webhookList(string $url): array
+    {
+        return $this->getWebhooksList()
+            ->map(fn($webhook) => [
+                'id' => $webhook['id'],
+                'status' => $webhook['status'],
+                'url' => $webhook['url'],
+                'production' => $webhook['livemode'] ? '✅' : '❎'
+            ])->toArray();
+    }
+
+    public function webhookDestroy(string $url): void
+    {
+        $this->getWebhooksList($url)
+            ->filter(fn($webhook) => $webhook['url'] === $url)
+            ->each(fn($webhook) =>
+                $this->stripe()->webhookEndpoints->delete($webhook['id'], [])
+            );
     }
 
     protected function getProductsAmount(array $products)
@@ -114,6 +156,19 @@ class StripeDriver extends Driver
         return Collection::make($products)->sum(
             fn ($product) => $product->price * $product->quantity
         );
+    }
+
+    protected function preparePaymentMethod(PaymentMethod $paymentMethod): array
+    {
+        if ($paymentMethod->id) {
+            return [
+                'payment_method' => $paymentMethod->id,
+                'confirm' => true,
+                'confirmation_method' => 'automatic',
+            ];
+        }
+
+        return $paymentMethod->toArray();
     }
 
     protected function prepareCustomer($customer): array
@@ -169,6 +224,18 @@ class StripeDriver extends Driver
         }
 
         return $paymentMethod;
+    }
+
+    protected function isAnOxxoOrder($order): bool
+    {
+        return ! is_null($order['payment_method_options']['oxxo']);
+    }
+
+    protected function getWebhooksList(): Collection
+    {
+        $response =  $this->stripe()->webhookEndpoints->all();
+
+        return Collection::make($response->data);
     }
 
     protected function stripe(array $options = []): StripeClient

@@ -52,6 +52,18 @@ class FactoryTest extends TestCase
 
     /**
      * @test
+     ** @define-env useSandboxDriver
+     */
+    public function it_returns_an_instance_of_different_default_driver()
+    {
+        $this->assertEquals(
+            \Beebmx\LaravelPay\Drivers\StripeDriver::class,
+            Factory::make('stripe')
+        );
+    }
+
+    /**
+     * @test
      * @define-env useDrivers
      */
     public function it_returns_all_the_driver_classes_available()
