@@ -147,6 +147,29 @@ To create a customer just use the method `createCustomerWithDriver`:
 $customer = $user->createCustomerWithDriver();
 ```
 
+### Basic information
+
+When a `user` becomes to `customer`, the columns used to create it, comes from the model, but you can customize this with:
+
+```php
+
+public function driverName()
+{
+    return "{$this->your_own_colunm_name} {$this->your_own_colunm_lastname}";
+}
+
+public function driverEmail()
+{
+    return $this->your_own_colunm_email;
+}
+
+public function driverPhone()
+{
+    return $this->your_own_colunm_phone;
+}
+
+```
+
 > Creating a user can be useful for recurring payments or to avoid asking for payment methods all the time.
 
 ## Payment Methods
