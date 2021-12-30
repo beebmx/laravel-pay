@@ -29,7 +29,7 @@ class CreateTransactionsTable extends Migration
 
             $table->timestamps();
 
-            $table->index(['user_id', 'status']);
+            $table->index(['user_id', 'service_id', 'service_payment_id', 'status']);
         });
     }
 

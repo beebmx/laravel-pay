@@ -4,9 +4,11 @@ namespace Beebmx\LaravelPay;
 
 class Pay
 {
-    const VERSION = '0.2.0';
+    const VERSION = '0.3.0';
 
     public static $runsMigrations = true;
+
+    public static $registersRoutes = true;
 
     public static $customerModel = 'App\\Models\\User';
 
@@ -46,5 +48,10 @@ class Pay
     public static function useTransactionItemModel($transactionItemModel)
     {
         static::$transactionItemModel = $transactionItemModel;
+    }
+
+    public static function getWebhookspath()
+    {
+        return config('pay.path') . '/' . config('pay.webhooks');
     }
 }

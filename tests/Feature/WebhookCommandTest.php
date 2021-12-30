@@ -8,7 +8,7 @@ use Beebmx\LaravelPay\Tests\TestCase;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
-class WebhookTest extends TestCase
+class WebhookCommandTest extends TestCase
 {
     /**
      * @test

@@ -26,7 +26,7 @@ class CreateAddressesTable extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->index(['user_id', 'state']);
+            $table->index('line1', 'state');
         });
     }
 

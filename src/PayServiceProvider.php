@@ -3,6 +3,7 @@
 namespace Beebmx\LaravelPay;
 
 use Beebmx\LaravelPay\Console\Webhook as WebhookCommand;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class PayServiceProvider extends ServiceProvider
@@ -12,6 +13,7 @@ class PayServiceProvider extends ServiceProvider
         $this->registerMigrations();
         $this->registerPublishing();
         $this->registerCommands();
+        $this->registerRoutes();
     }
 
     public function register()
@@ -61,8 +63,17 @@ class PayServiceProvider extends ServiceProvider
             ], 'pay-migrations');
 
 //            $this->publishes([
-//                __DIR__.'/../resources/views' => $this->app->resourcePath('views/vendor/cashier'),
+//                __DIR__.'/../resources/views' => $this->app->resourcePath('views/vendor/pay'),
 //            ], 'pay-views');
+        }
+    }
+
+    protected function registerRoutes()
+    {
+        if (Pay::$registersRoutes) {
+            Route::group(['prefix' => config('pay.path'), 'as' => 'pay.'], function () {
+                $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+            });
         }
     }
 

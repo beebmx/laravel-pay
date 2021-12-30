@@ -21,8 +21,6 @@ class CreateTransactionItemsTable extends Migration
             $table->integer('quantity');
             $table->unsignedBigInteger('product_id')->nullable();
             $table->timestamps();
-
-            $table->index(['transaction_id']);
         });
     }
 

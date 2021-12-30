@@ -25,10 +25,10 @@ class TransactionItemFactory extends Factory
     public function definition()
     {
         return [
-            'transaction_id',
-            'name',
-            'price',
-            'quantity',
+            'transaction_id' => Transaction::factory(),
+            'name' => 'product ' . Str::random(10),
+            'price' => $this->faker->numberBetween(100, 1000),
+            'quantity' => $this->faker->numberBetween(1, 10),
             'product_id',
         ];
     }

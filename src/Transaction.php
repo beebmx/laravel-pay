@@ -47,6 +47,34 @@ class Transaction extends Model
         return $this;
     }
 
+    public function paid()
+    {
+        return $this->forceFill([
+            'status' => 'paid',
+        ])->save();
+    }
+
+    public function canceled()
+    {
+        return $this->forceFill([
+            'status' => 'canceled',
+        ])->save();
+    }
+
+    public function changeStatus(string $status)
+    {
+        return $this->forceFill([
+            'status' => $status,
+        ])->save();
+    }
+
+    public static function findByPaymentId(string $payment_id)
+    {
+        return self::query()
+            ->where('service_payment_id', $payment_id)
+            ->first();
+    }
+
     /**
      * Create a new factory instance for the model.
      *

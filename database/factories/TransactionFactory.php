@@ -2,6 +2,7 @@
 
 namespace Beebmx\LaravelPay\Database\Factories;
 
+use Beebmx\LaravelPay\Pay;
 use Beebmx\LaravelPay\Tests\Fixtures\User;
 use Beebmx\LaravelPay\Transaction;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -23,15 +24,17 @@ class TransactionFactory extends Factory
      */
     public function definition()
     {
+        $user = Pay::$customerModel;
+
         return [
-            'user_id',
-            'service',
-            'service_id',
-            'service_type',
-            'service_payment_id',
-            'amount',
-            'currency',
-            'status',
+            (new $user)->getForeignKey() => ($user)::factory(),
+            'service' => config('pay.default'),
+            'service_id' => 'src_' . Str::random(17),
+            'service_type' => 'card',
+            'service_payment_id' => 'ord_' . Str::random(17),
+            'amount' => $this->faker->numberBetween(100, 1000),
+            'currency' => 'usd',
+            'status' => $this->faker->randomElement(['pending', 'paid', 'canceled']),
         ];
     }
 }

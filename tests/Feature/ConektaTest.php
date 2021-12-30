@@ -12,6 +12,15 @@ use Beebmx\LaravelPay\TransactionItem;
 
 class ConektaTest extends FeatureTestCase
 {
+    protected function setUp(): void
+    {
+        if ((getenv('PAY_TEST_FULL_SUITE') === '(false)' || !getenv('PAY_TEST_FULL_SUITE')) || !getenv('CONEKTA_SECRET_KEY')) {
+            $this->markTestSkipped('Conekta Test are skipped');
+        }
+
+        parent::setUp();
+    }
+
     /** @test */
     public function a_customer_can_be_created()
     {
