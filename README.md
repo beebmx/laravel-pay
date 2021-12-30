@@ -1,16 +1,9 @@
 # Laravel Pay
 
-[![Build Status](https://travis-ci.org/beebmx/laravel-pay.svg?branch=master)](https://travis-ci.org/beebmx/laravel-pay)
 [![Latest Stable Version](https://poser.pugx.org/beebmx/laravel-pay/v)](//packagist.org/packages/beebmx/laravel-pay)
 [![License](https://poser.pugx.org/beebmx/laravel-pay/license)](//packagist.org/packages/beebmx/laravel-pay)
 
----
-Laravel Pay
-
-1. 
----
-
-Laravel Pay is inspired by the official `Laravel Cashier`.
+Laravel Pay is inspired by the official [Laravel Cashier](https://laravel.com/docs/8.x/billing).
 The approach is slightly different to `Cashier` and the main behavior is the payment transactions. 
 
 ## Installation
@@ -258,6 +251,114 @@ php artisan pay:webhook
 ```
 
 > The driver `sandbox` doesn't allow the creation of webhooks.
+
+### Handlers
+
+The `WebhookController` always react to the events emitted from the driver provider and passes to the correct handler.
+By default, every driver has their own handler defined in the `config/pay.php` file: 
+
+```php
+'drivers' => [
+    'stripe' => [
+        'webhooks' => [
+            'handler' => Beebmx\LaravelPay\Http\Webhooks\StripeHandler::class,
+            'events' => [
+                'customer.deleted',
+                'customer.updated',
+                'invoice.payment_action_required',
+                'payment_intent.canceled',
+                'payment_intent.payment_failed',
+                'payment_intent.requires_action',
+                'payment_intent.succeeded',
+            ],
+        ],
+    ],
+
+    'conekta' => [
+        'webhooks' => [
+            'handler' => Beebmx\LaravelPay\Http\Webhooks\ConektaHandler::class,
+        ],
+    ],
+],
+```
+
+You can change the handler with your own implementation, just make your to extends from the right handler.
+
+```php
+<?php
+
+use Beebmx\LaravelPay\Http\Webhooks\StripeHandler as PayStripeHandler;
+
+class StripeHandler extends PayStripeHandler
+{
+    // ...
+}
+```
+
+The methods names should correspond to the convention, first all methods should be prefixed with `handle` and the "camel case" name of the webhook you wish to handle. 
+For example, if you wish to handle the `payment_intent.succeeded` webhook, you should add a `handlePaymentIntentSucceeded` method to the controller:
+
+```php
+<?php
+
+use Beebmx\LaravelPay\Http\Webhooks\StripeHandler as PayStripeHandler;
+
+class StripeHandler extends PayStripeHandler
+{
+    public function handlePaymentIntentSucceeded($payload)
+    {
+        // ...
+    }
+}
+```
+
+> On each handled method an array with `$payload` correspondence is always received.
+
+### Webhook events
+
+On each webhook call, the following events could be dispatched:
+
+- `Beebmx\LaravelPay\Events\WebhookReceived`
+- `Beebmx\LaravelPay\Events\WebhookHandled`
+
+You can create your own implementation of the `payload`:
+
+```php
+<?php
+
+namespace App\Listeners;
+
+use Beebmx\LaravelPay\Events\WebhookReceived;
+
+class StripeEventListener
+{
+    public function handle(WebhookReceived $event)
+    {
+        // $event->payload['type']
+    }
+}
+```
+
+To listen this implementation is required to register in your `App\Providers\EventServiceProvider`:
+
+```php
+<?php
+
+namespace App\Providers;
+
+use App\Listeners\StripeEventListener;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Beebmx\LaravelPay\Events\WebhookReceived;
+
+class EventServiceProvider extends ServiceProvider
+{
+    protected $listen = [
+        WebhookReceived::class => [
+            StripeEventListener::class,
+        ],
+    ];
+}
+```
 
 ## Testing
 
