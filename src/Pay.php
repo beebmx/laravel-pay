@@ -4,7 +4,7 @@ namespace Beebmx\LaravelPay;
 
 class Pay
 {
-    const VERSION = '0.3.2';
+    const VERSION = '0.3.3';
 
     public static $runsMigrations = true;
 
