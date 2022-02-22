@@ -20,6 +20,7 @@ abstract class Element implements Arrayable, Jsonable, JsonSerializable
         return $this->driverElement;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();

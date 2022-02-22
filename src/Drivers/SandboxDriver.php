@@ -58,7 +58,7 @@ class SandboxDriver extends Driver
         return (object) [
             'token_id' => $token,
             'token' => $token,
-            'type' => 'visa',
+            'type' => 'card',
             'name' => 'John Doe',
             'exp_month' => '12',
             'exp_year' => '20',

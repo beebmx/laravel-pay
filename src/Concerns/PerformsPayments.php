@@ -56,13 +56,12 @@ trait PerformsPayments
             $options
         );
 
-
         $transaction = $this->transactions()->create([
             'service' => $this->driver()->name(),
             'service_id' => $this->getPaymentMethodId($paymentMethod, $payment),
             'service_type' => $paymentMethod->type ?? $payment->type,
             'service_payment_id' => $payment->id,
-            'amount' => $payment->amount,
+            'amount' => $this->driver()->parsePrice($payment->amount),
             'currency' => $payment->currency,
             'status' => $payment->status,
             'payload' => $payment,
