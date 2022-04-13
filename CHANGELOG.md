@@ -2,6 +2,10 @@
 
 All notable changes to `Laravel Pay` will be documented in this file.
 
+## 0.4.0 - 2022-04-13
+
+- Support Laravel 9.x
+
 ## 0.3.3 - 2022-02-21
 
 - Fixed an issue with transaction amounts
