@@ -2,6 +2,10 @@
 
 All notable changes to `Laravel Pay` will be documented in this file.
 
+## 0.4.1 - 2022-08-02
+
+- Fixed an issue with TransactionItemFactory
+
 ## 0.4.0 - 2022-04-13
 
 - Support Laravel 9.x
