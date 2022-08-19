@@ -2,6 +2,10 @@
 
 All notable changes to `Laravel Pay` will be documented in this file.
 
+## 0.5.0 - 2022-08-19
+
+- Added the hability to have discounts in charges
+
 ## 0.4.1 - 2022-08-02
 
 - Fixed an issue with TransactionItemFactory

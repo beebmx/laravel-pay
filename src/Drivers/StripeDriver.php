@@ -2,6 +2,7 @@
 
 namespace Beebmx\LaravelPay\Drivers;
 
+use Beebmx\LaravelPay\Discount;
 use Beebmx\LaravelPay\Elements\Customer as PayCustomer;
 use Beebmx\LaravelPay\Elements\PaymentMethod;
 use Beebmx\LaravelPay\Pay;
@@ -103,12 +104,12 @@ class StripeDriver extends Driver
         ];
     }
 
-    public function charge(PayCustomer $customer, PaymentMethod $paymentMethod, array $products, $address = null, $options = []): object
+    public function charge(PayCustomer $customer, PaymentMethod $paymentMethod, array $products, Discount $discount, $address = null, array $options = []): object
     {
         return tap($this->stripe()->paymentIntents->create(array_merge(
             [
                 'amount' => $this->preparePrice(
-                    $this->getProductsAmount($products)
+                    $this->getProductsAmount($products) - $discount->amount
                 ),
                 'currency' => config('pay.currency'),
             ],

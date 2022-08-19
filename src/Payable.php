@@ -4,6 +4,7 @@ namespace Beebmx\LaravelPay;
 
 use Beebmx\LaravelPay\Concerns\ManageCustomer;
 use Beebmx\LaravelPay\Concerns\ManagesAddresses;
+use Beebmx\LaravelPay\Concerns\ManagesDiscounts;
 use Beebmx\LaravelPay\Concerns\ManagesFactories;
 use Beebmx\LaravelPay\Concerns\ManagesPaymentMethods;
 use Beebmx\LaravelPay\Concerns\ManagesTransactions;
@@ -13,6 +14,7 @@ trait Payable
 {
     use ManageCustomer;
     use ManagesAddresses;
+    use ManagesDiscounts;
     use ManagesFactories;
     use ManagesPaymentMethods;
     use ManagesTransactions;

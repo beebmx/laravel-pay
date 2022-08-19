@@ -2,6 +2,7 @@
 
 namespace Beebmx\LaravelPay\Drivers;
 
+use Beebmx\LaravelPay\Discount;
 use Beebmx\LaravelPay\Elements\Customer;
 use Beebmx\LaravelPay\Elements\PaymentMethod;
 use Beebmx\LaravelPay\Exceptions\WebhookUnavailable;
@@ -79,10 +80,10 @@ class SandboxDriver extends Driver
         ];
     }
 
-    public function charge(Customer $customer, PaymentMethod $paymentMethod, array $products, $address = null, $options = []): object
+    public function charge(Customer $customer, PaymentMethod $paymentMethod, array $products, Discount $discount, $address = null, array $options = []): object
     {
         return (object) array_merge(
-            $this->preparePayment($customer->asDriver(), $paymentMethod->asDriver(), $products),
+            $this->preparePayment($customer->asDriver(), $paymentMethod->asDriver(), $products, $discount),
             $this->prepareShipping($address),
         );
     }
@@ -192,15 +193,16 @@ class SandboxDriver extends Driver
         ];
     }
 
-    protected function preparePayment($customer, $paymentMethod, $products)
+    protected function preparePayment($customer, $paymentMethod, $products, $discount)
     {
         $id = 'ord_' . Str::random(17);
-        $amount = $this->getProductsAmount($products);
+        $amount = $this->getProductsAmount($products) - $discount->amount;
 
         return [
             'id' => $id,
             'object' => 'order',
             'amount' => $amount,
+            'discount' => $discount->amount,
             'status' => 'paid',
             'currency' => 'MXN',
             'customer_info' => [
@@ -234,6 +236,7 @@ class SandboxDriver extends Driver
                     'created_at' => Carbon::now()->timestamp,
                     'status' => 'paid',
                     'amount' => $amount,
+                    'discount' => $discount,
                     'currency' => 'MXN',
                     'customer_id' => $paymentMethod->parent_id,
                     'order_id' => $id,

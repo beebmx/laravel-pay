@@ -2,7 +2,9 @@
 
 namespace Beebmx\LaravelPay\Contracts;
 
+use Beebmx\LaravelPay\Discount;
 use Beebmx\LaravelPay\Elements\Customer;
+
 use Beebmx\LaravelPay\Elements\PaymentMethod;
 
 interface Driverable
@@ -25,11 +27,12 @@ interface Driverable
      * @param Customer $customer
      * @param PaymentMethod $paymentMethod
      * @param array $products
-     * @param \Beebmx\LaravelPay\Address|null $address
+
+     * @param null $address
      * @param array $options
      * @return object
      */
-    public function charge(Customer $customer, PaymentMethod $paymentMethod, array $products, $address = null, $options = []): object;
+    public function charge(Customer $customer, PaymentMethod $paymentMethod, array $products, Discount $discount, $address = null, array $options = []): object;
 
     public function preparePrice($amount): int|float;
 

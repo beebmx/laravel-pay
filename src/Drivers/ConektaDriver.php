@@ -2,6 +2,7 @@
 
 namespace Beebmx\LaravelPay\Drivers;
 
+use Beebmx\LaravelPay\Discount;
 use Beebmx\LaravelPay\Elements\Customer as PayCustomer;
 use Beebmx\LaravelPay\Elements\PaymentMethod;
 use Conekta\Conekta;
@@ -10,6 +11,7 @@ use Conekta\Order;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class ConektaDriver extends Driver
 {
@@ -82,7 +84,7 @@ class ConektaDriver extends Driver
         ];
     }
 
-    public function charge(PayCustomer $customer, PaymentMethod $paymentMethod, array $products, $address = null, $options = []): object
+    public function charge(PayCustomer $customer, PaymentMethod $paymentMethod, array $products, Discount $discount, $address = null, array $options = []): object
     {
         return tap(Order::create(array_merge(
             [
@@ -94,6 +96,7 @@ class ConektaDriver extends Driver
             $this->prepareCustomer($customer),
             $this->prepareItems($products),
             $this->prepareShipping($address),
+            $this->prepareDiscount($discount),
         )), function ($order) use ($paymentMethod) {
             $order->status = $order->payment_status;
 
@@ -209,6 +212,21 @@ class ConektaDriver extends Driver
                     return !empty($value);
                 })->toArray(),
             ],
+        ];
+    }
+
+    protected function prepareDiscount(Discount $discount): array
+    {
+        if ($discount->amount === 0) {
+            return [];
+        }
+
+        return [
+            'discount_lines' => [[
+                'type' => 'coupon',
+                'amount' => $this->preparePrice($discount->amount),
+                'code' => $discount->code ?? Str::random(),
+            ]]
         ];
     }
 

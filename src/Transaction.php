@@ -18,7 +18,9 @@ class Transaction extends Model
     protected $casts = [
         'user_id' => 'integer',
         'address_id' => 'integer',
-        'amount' => 'array',
+        'amount' => 'double',
+        'total' => 'double',
+        'discount' => 'double',
         'payload' => 'array',
     ];
 

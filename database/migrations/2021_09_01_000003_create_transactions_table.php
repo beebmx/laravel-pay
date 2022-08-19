@@ -22,6 +22,8 @@ class CreateTransactionsTable extends Migration
             $table->string('service_payment_id')->unique();
             $table->string('address_id')->nullable();
             $table->string('amount')->nullable();
+            $table->string('total')->nullable();
+            $table->string('discount')->nullable();
             $table->string('currency')->nullable();
             $table->string('shipping')->nullable();
             $table->string('status');

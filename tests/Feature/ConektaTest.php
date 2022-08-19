@@ -110,6 +110,27 @@ class ConektaTest extends FeatureTestCase
     }
 
     /** @test */
+    public function a_charge_can_have_discount()
+    {
+        $user = User::factory()->create();
+        $user->createCustomerWithDriver();
+        $user->addPaymentMethod('tok_test_visa_4242');
+
+        $payment = $user
+            ->discount(['amount' => 200, 'code' => '200coupon'])
+            ->charge([
+                'name' => 'Testing product',
+                'price' => 500,
+            ]);
+
+        $this->assertNotNull($payment->getTransaction()->total);
+        $this->assertNotNull($payment->getTransaction()->discount);
+        $this->assertEquals(300, $payment->getTransaction()->amount);
+        $this->assertEquals(500, $payment->getTransaction()->total);
+        $this->assertEquals(200, $payment->getTransaction()->discount);
+    }
+
+    /** @test */
     public function a_user_can_create_a_charge_with_one_time_token_payment_method()
     {
         $user = User::factory()->create();

@@ -134,6 +134,25 @@ class PaymentTest extends FeatureTestCase
     }
 
     /** @test */
+    public function a_charge_payment_can_have_discount()
+    {
+        $user = User::factory()->create(['service_customer_id' => 'cus_0123456789', 'service_payment_id' => 'src_0123456789']);
+
+        $payment = $user
+            ->discount(200)
+            ->charge([
+                'name' => 'Testing product',
+                'price' => 500,
+            ]);
+
+        $this->assertNotNull($payment->getTransaction()->total);
+        $this->assertNotNull($payment->getTransaction()->discount);
+        $this->assertEquals(300, $payment->getTransaction()->amount);
+        $this->assertEquals(500, $payment->getTransaction()->total);
+        $this->assertEquals(200, $payment->getTransaction()->discount);
+    }
+
+    /** @test */
     public function a_user_can_create_a_charge_with_one_time_payment_method()
     {
         $user = User::factory()->create();

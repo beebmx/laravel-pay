@@ -52,6 +52,7 @@ trait PerformsPayments
             $customer,
             $paymentMethod,
             $products,
+            $this->getDiscount(),
             $this->currentShippingAddress(),
             $options
         );
@@ -62,6 +63,8 @@ trait PerformsPayments
             'service_type' => $paymentMethod->type ?? $payment->type,
             'service_payment_id' => $payment->id,
             'amount' => $this->driver()->parsePrice($payment->amount),
+            'total' => $this->driver()->parsePrice($payment->amount) + $this->getDiscount()->amount,
+            'discount' => $this->getDiscount()->amount,
             'currency' => $payment->currency,
             'status' => $payment->status,
             'payload' => $payment,

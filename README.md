@@ -214,6 +214,41 @@ $user->charge([[
 ]]);
 ```
 
+If you have a discount to be applied you can set it:
+
+```php
+$user
+    ->discount(200)
+    ->charge([[
+        'name' => 'Product 01',
+        'price' => 100,
+        'quantity' => 2
+    ], [
+        'name' => 'Product 02',
+        'price' => 200,
+        'quantity' => 1,
+    ]]);
+```
+
+Or you can set it with more information like:
+
+```php
+$user
+    ->discount([
+        'amount' => 200, 
+        'code' => 'coupon-code',
+    ])
+    ->charge([[
+        'name' => 'Product 01',
+        'price' => 100,
+        'quantity' => 2
+    ], [
+        'name' => 'Product 02',
+        'price' => 200,
+        'quantity' => 1,
+    ]]);
+```
+
 > It's important that the user has at least one `payment method`.
 
 If you have a shipping address:

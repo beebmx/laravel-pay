@@ -33,6 +33,7 @@ class TransactionFactory extends Factory
             'service_type' => 'card',
             'service_payment_id' => 'ord_' . Str::random(17),
             'amount' => $this->faker->numberBetween(100, 1000),
+            'discount' => 0,
             'currency' => 'usd',
             'status' => $this->faker->randomElement(['pending', 'paid', 'canceled']),
         ];
