@@ -2,20 +2,18 @@
 
 namespace Beebmx\LaravelPay\Elements;
 
-use Beebmx\LaravelPay\Transaction;
-
 class Payment extends Element
 {
-    protected Transaction $transaction;
+    protected $transaction;
 
-    public function setTransaction(Transaction $transaction): static
+    public function setTransaction($transaction): static
     {
         $this->transaction = $transaction;
 
         return $this;
     }
 
-    public function getTransaction(): Transaction
+    public function getTransaction()
     {
         return $this->transaction;
     }
