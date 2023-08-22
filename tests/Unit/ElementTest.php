@@ -49,8 +49,8 @@ class ElementTest extends TestCase
 
     protected function mock_object(): object
     {
-        return (object)[
-            'id' => 'cus_' . Str::random(14),
+        return (object) [
+            'id' => 'cus_'.Str::random(14),
             'object' => 'customer',
             'address' => null,
             'balance' => 0,
@@ -65,7 +65,7 @@ class ElementTest extends TestCase
             'invoice_settings' => [
                 'custom_fields' => null,
                 'default_payment_method' => null,
-                'footer' => null
+                'footer' => null,
             ],
             'livemode' => false,
             'name' => 'John Doe',

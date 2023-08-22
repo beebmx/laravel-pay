@@ -1,9 +1,9 @@
-# Laravel Pay
+# Payments for Laravel
 
 [![Latest Stable Version](https://poser.pugx.org/beebmx/laravel-pay/v)](//packagist.org/packages/beebmx/laravel-pay)
 [![License](https://poser.pugx.org/beebmx/laravel-pay/license)](//packagist.org/packages/beebmx/laravel-pay)
 
-Laravel Pay is inspired by the official [Laravel Cashier](https://laravel.com/docs/8.x/billing).
+Payments for Laravel is inspired by the official [Laravel Cashier](https://laravel.com/docs/10.x/billing).
 The approach is slightly different to `Cashier` and the main behavior is the payment transactions. 
 
 ## Installation
@@ -28,7 +28,7 @@ php artisan vendor:publish --provider="Beebmx\LaravelPay\PayServiceProvider" --t
 
 ## Configuration
 
-Before use `Laravel Pay` you need to add the `Payable` trait to your user model, the default location of this is in `App\Models\Users`:
+Before use `Payments for Laravel` you need to add the `Payable` trait to your user model, the default location of this is in `App\Models\Users`:
 
 ```php
 use Beebmx\LaravelPay\Payable;
@@ -41,7 +41,7 @@ class User extends Authenticatable {
 
 ### Custom models
 
-You can use your own models to fit your needs, just set in the `App\Providers\AppServiceProvider` and inform Laravel Pay in the `boot` method:
+You can use your own models to fit your needs, just set in the `App\Providers\AppServiceProvider` and inform Payments for Laravel in the `boot` method:
 
 ```php
 use App\Models\Address;
@@ -64,7 +64,7 @@ public function boot()
 }
 ```
 
-Just remember, if you change this for your own models, make sure to extend these models with the `Laravel Pay`:
+Just remember, if you change this for your own models, make sure to extend these models with the `Payments for Laravel`:
 
 ```php
 use Beebmx\LaravelPay\Address as PayAddress;
@@ -290,7 +290,7 @@ $payment->getTransaction()
 
 ## Webhooks
 
-By default `Laravel Pay` provides a handy management of webhooks.
+By default `Payments for Laravel` provides a handy management of webhooks.
 
 First in your `App\Http\Middleware\VerifyCsrfToken` file, you need to allow the path of the WebhookController:
 

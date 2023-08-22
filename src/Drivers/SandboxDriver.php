@@ -130,7 +130,7 @@ class SandboxDriver extends Driver
     protected function prepareCustomer(?string $customerId, array $options = []): array
     {
         return [
-            'id' => $customerId ?? 'cus_' . Str::random(14),
+            'id' => $customerId ?? 'cus_'.Str::random(14),
             'object' => 'customer',
             'address' => null,
             'balance' => 0,
@@ -145,7 +145,7 @@ class SandboxDriver extends Driver
             'invoice_settings' => [
                 'custom_fields' => null,
                 'default_payment_method' => null,
-                'footer' => null
+                'footer' => null,
             ],
             'livemode' => false,
             'name' => $options['name'],
@@ -178,7 +178,7 @@ class SandboxDriver extends Driver
     protected function preparePaymentMethod(?string $paymentMethod, $customerId, $type = 'card'): array
     {
         return [
-            'id' => $paymentMethod ?? 'src_' . Str::random(17),
+            'id' => $paymentMethod ?? 'src_'.Str::random(17),
             'object' => 'payment_source',
             'type' => $type,
             'created_at' => Carbon::now()->timestamp,
@@ -195,7 +195,7 @@ class SandboxDriver extends Driver
 
     protected function preparePayment($customer, $paymentMethod, $products, $discount)
     {
-        $id = 'ord_' . Str::random(17);
+        $id = 'ord_'.Str::random(17);
         $amount = $this->getProductsAmount($products) - $discount->amount;
 
         return [
@@ -219,7 +219,7 @@ class SandboxDriver extends Driver
                 'total' => Collection::make($products)->sum(fn ($product) => $product->quantity),
                 'data' => Collection::make($products)->map(function ($product) use ($id) {
                     return [
-                        'id' => 'line_item_' . Str::random(17),
+                        'id' => 'line_item_'.Str::random(17),
                         'object' => 'line_item',
                         'name' => $product->name,
                         'unit_price' => $product->price,
@@ -248,8 +248,8 @@ class SandboxDriver extends Driver
                         'exp_year' => $paymentMethod->exp_year,
                         'last4' => $paymentMethod->last4,
                         'country' => 'MX',
-                    ]
-                ]]
+                    ],
+                ]],
             ],
             'oxxo_reference' => Str::random(14),
         ];

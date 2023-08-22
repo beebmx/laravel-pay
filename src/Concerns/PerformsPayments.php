@@ -12,8 +12,6 @@ use Illuminate\Support\Collection;
 trait PerformsPayments
 {
     /**
-     * @param array $product
-     * @param PaymentMethod|null $paymentMethod
      * @throws InvalidPayment
      * @throws InvalidPaymentMethod
      * @throws \Beebmx\LaravelPay\Exceptions\DriverNonInstantiable
@@ -26,13 +24,13 @@ trait PerformsPayments
             throw InvalidPayment::product();
         }
 
-        $paymentMethod = match(true) {
+        $paymentMethod = match (true) {
             $this->hasOneTimeTokenPaymentMethod() => $this->getOneTimeTokenPaymentMethod(),
             $this->hasOxxoPaymentMethod() => $this->getOxxoPaymentMethod(),
             default => $paymentMethod
         };
 
-        if (!$paymentMethod && !$this->hasDefaultPayment()) {
+        if (! $paymentMethod && ! $this->hasDefaultPayment()) {
             throw InvalidPaymentMethod::exists();
         }
 
@@ -44,7 +42,7 @@ trait PerformsPayments
 
         $paymentMethod = $this->getPaymentMethod($paymentMethod);
 
-        $customer = $this->hasOneTimePaymentMethod() && !$this->isCustomer()
+        $customer = $this->hasOneTimePaymentMethod() && ! $this->isCustomer()
             ? $this->asAnonymousCustomer()
             : $this->asCustomer();
 
@@ -92,7 +90,7 @@ trait PerformsPayments
 
     protected function parseProduct(array $product): Product
     {
-        if (!$this->isProductValid($product)) {
+        if (! $this->isProductValid($product)) {
             throw InvalidPayment::price($product);
         }
 
@@ -104,10 +102,6 @@ trait PerformsPayments
         return array_key_exists('price', $product);
     }
 
-    /**
-     * @param string|PaymentMethod|null $paymentMethod
-     * @return PaymentMethod
-     */
     protected function getPaymentMethod(PaymentMethod|string|null $paymentMethod): PaymentMethod
     {
         if ($paymentMethod) {
@@ -119,11 +113,11 @@ trait PerformsPayments
 
     public function getPaymentMethodId(PaymentMethod $paymentMethod, $payment = null)
     {
-        return match(true) {
-            !is_null($paymentMethod->id) => $paymentMethod->id,
-            !is_null($paymentMethod->token) => $paymentMethod->token,
-            !is_null($payment->oxxo_reference) => $payment->oxxo_reference,
-            !is_null($payment->oxxo_secret) => $payment->oxxo_secret
+        return match (true) {
+            ! is_null($paymentMethod->id) => $paymentMethod->id,
+            ! is_null($paymentMethod->token) => $paymentMethod->token,
+            ! is_null($payment->oxxo_reference) => $payment->oxxo_reference,
+            ! is_null($payment->oxxo_secret) => $payment->oxxo_secret
         };
     }
 }

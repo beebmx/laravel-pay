@@ -4,7 +4,6 @@ namespace Beebmx\LaravelPay\Contracts;
 
 use Beebmx\LaravelPay\Discount;
 use Beebmx\LaravelPay\Elements\Customer;
-
 use Beebmx\LaravelPay\Elements\PaymentMethod;
 
 interface Driverable
@@ -24,13 +23,7 @@ interface Driverable
     public function token(string $token): object;
 
     /**
-     * @param Customer $customer
-     * @param PaymentMethod $paymentMethod
-     * @param array $products
-
-     * @param null $address
-     * @param array $options
-     * @return object
+     * @param  null  $address
      */
     public function charge(Customer $customer, PaymentMethod $paymentMethod, array $products, Discount $discount, $address = null, array $options = []): object;
 

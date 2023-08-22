@@ -36,6 +36,7 @@ class WebhooksEventTest extends FeatureTestCase
 
     /**
      * @test
+     *
      * @define-env useConektaDriver
      */
     public function a_webhook_dispatch_webhook_handled_if_its_handled()

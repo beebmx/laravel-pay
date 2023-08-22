@@ -13,7 +13,7 @@ class WebhookStripeHandlerTest extends FeatureTestCase
     /** @test */
     public function a_payment_intent_succeeded_mark_as_paid_the_transaction()
     {
-        $id = 'pi_' . Str::random(17);
+        $id = 'pi_'.Str::random(17);
         $transaction = Transaction::factory()->create(['service_payment_id' => $id, 'status' => 'pending']);
 
         (new StripeHandler)->handlePaymentIntentSucceeded($this->mockResponse($id));
@@ -24,7 +24,7 @@ class WebhookStripeHandlerTest extends FeatureTestCase
     /** @test */
     public function a_payment_intent_canceled_mark_as_cancel_the_transaction()
     {
-        $id = 'pi_' . Str::random(17);
+        $id = 'pi_'.Str::random(17);
         $transaction = Transaction::factory()->create(['service_payment_id' => $id, 'status' => 'pending']);
 
         (new StripeHandler)->handlePaymentIntentSucceeded($this->mockResponse($id, 'canceled', 'payment_intent.canceled'));
@@ -43,7 +43,7 @@ class WebhookStripeHandlerTest extends FeatureTestCase
         return [
             'created' => Carbon::now()->timestamp,
             'livemode' => false,
-            'id' => 'evt_' . Str::random(14),
+            'id' => 'evt_'.Str::random(14),
             'type' => $type,
             'object' => 'event',
             'request' => null,
@@ -66,7 +66,7 @@ class WebhookStripeHandlerTest extends FeatureTestCase
                         'object' => 'list',
                         'data' => [
                             [
-                                'id' => 'ch_' . Str::random(14),
+                                'id' => 'ch_'.Str::random(14),
                                 'object' => 'charge',
                                 'amount' => 50000,
                                 'amount_captured' => 50000,
@@ -74,7 +74,7 @@ class WebhookStripeHandlerTest extends FeatureTestCase
                                 'application' => null,
                                 'application_fee' => null,
                                 'application_fee_amount' => null,
-                                'balance_transaction' => 'txn_' . Str::random(14),
+                                'balance_transaction' => 'txn_'.Str::random(14),
                                 'billing_details' => [
                                     'address' => [
                                         'city' => null,
@@ -82,11 +82,11 @@ class WebhookStripeHandlerTest extends FeatureTestCase
                                         'line1' => null,
                                         'line2' => null,
                                         'postal_code' => null,
-                                        'state' => null
+                                        'state' => null,
                                     ],
                                     'email' => null,
                                     'name' => 'John Doe',
-                                    'phone' => null
+                                    'phone' => null,
                                 ],
                                 'calculated_statement_descriptor' => 'Descriptor',
                                 'captured' => true,
@@ -109,7 +109,7 @@ class WebhookStripeHandlerTest extends FeatureTestCase
                                     'risk_level' => 'normal',
                                     'risk_score' => 42,
                                     'seller_message' => 'Payment complete.',
-                                    'type' => 'authorized'
+                                    'type' => 'authorized',
                                 ],
                                 'paid' => true,
                                 'payment_intent' => $id,
@@ -120,7 +120,7 @@ class WebhookStripeHandlerTest extends FeatureTestCase
                                         'checks' => [
                                             'address_line1_check' => null,
                                             'address_postal_code_check' => null,
-                                            'cvc_check' => 'pass'
+                                            'cvc_check' => 'pass',
                                         ],
                                         'country' => 'US',
                                         'exp_month' => 12,
@@ -131,20 +131,20 @@ class WebhookStripeHandlerTest extends FeatureTestCase
                                         'last4' => '4242',
                                         'network' => 'visa',
                                         'three_d_secure' => null,
-                                        'wallet' => null
+                                        'wallet' => null,
                                     ],
-                                    'type' => 'card'
+                                    'type' => 'card',
                                 ],
                                 'receipt_email' => null,
                                 'receipt_number' => null,
-                                'receipt_url' => 'https://pay.stripe.com/receipts/acct_' . Str::random(16) . '/ch_' . Str::random(24) . '/rcpt_' . Str::random(31),
+                                'receipt_url' => 'https://pay.stripe.com/receipts/acct_'.Str::random(16).'/ch_'.Str::random(24).'/rcpt_'.Str::random(31),
                                 'refunded' => false,
                                 'refunds' => [
                                     'object' => 'list',
                                     'data' => [
                                     ],
                                     'has_more' => false,
-                                    'url' => '/v1/charges/ch_' . Str::random(24) . '/refunds'
+                                    'url' => '/v1/charges/ch_'.Str::random(24).'/refunds',
                                 ],
                                 'review' => null,
                                 'shipping' => null,
@@ -153,13 +153,13 @@ class WebhookStripeHandlerTest extends FeatureTestCase
                                 'statement_descriptor_suffix' => null,
                                 'status' => $status,
                                 'transfer_data' => null,
-                                'transfer_group' => null
-                            ]
+                                'transfer_group' => null,
+                            ],
                         ],
                         'has_more' => false,
-                        'url' => '/v1/charges?payment_intent=pi_' . Str::random(24)
+                        'url' => '/v1/charges?payment_intent=pi_'.Str::random(24),
                     ],
-                    'client_secret' => 'pi_' . Str::random(25) . '_secret_' . Str::random(25),
+                    'client_secret' => 'pi_'.Str::random(25).'_secret_'.Str::random(25),
                     'confirmation_method' => 'automatic',
                     'created' => Carbon::now()->timestamp,
                     'currency' => 'usd',
@@ -171,16 +171,16 @@ class WebhookStripeHandlerTest extends FeatureTestCase
                     'metadata' => [],
                     'next_action' => null,
                     'on_behalf_of' => null,
-                    'payment_method' => 'pm_' . Str::random(14),
+                    'payment_method' => 'pm_'.Str::random(14),
                     'payment_method_options' => [
                         'card' => [
                             'installments' => null,
                             'network' => null,
-                            'request_three_d_secure' => 'automatic'
-                        ]
+                            'request_three_d_secure' => 'automatic',
+                        ],
                     ],
                     'payment_method_types' => [
-                        'card'
+                        'card',
                     ],
                     'processing' => null,
                     'receipt_email' => null,
@@ -191,9 +191,9 @@ class WebhookStripeHandlerTest extends FeatureTestCase
                     'statement_descriptor_suffix' => null,
                     'status' => $status,
                     'transfer_data' => null,
-                    'transfer_group' => null
-                ]
-            ]
+                    'transfer_group' => null,
+                ],
+            ],
         ];
     }
 }

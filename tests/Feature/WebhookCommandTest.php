@@ -2,7 +2,6 @@
 
 namespace Beebmx\LaravelPay\Tests\Feature;
 
-use Beebmx\LaravelPay\Console\Webhook;
 use Beebmx\LaravelPay\Exceptions\WebhookUnavailable;
 use Beebmx\LaravelPay\Tests\TestCase;
 use Illuminate\Console\Command;
@@ -12,6 +11,7 @@ class WebhookCommandTest extends TestCase
 {
     /**
      * @test
+     *
      * @define-env useSandboxDriver
      */
     public function a_webhook_command_takes_the_default_driver()
@@ -24,6 +24,7 @@ class WebhookCommandTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env useSandboxDriver
      */
     public function a_webhook_command_can_not_list_in_sandbox()
@@ -35,6 +36,7 @@ class WebhookCommandTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env useSandboxDriver
      */
     public function a_webhook_command_can_not_destroy_in_sandbox()
@@ -42,11 +44,12 @@ class WebhookCommandTest extends TestCase
         $this->expectException(WebhookUnavailable::class);
 
         $this->artisan('pay:webhooks --destroy')
-            ->expectsConfirmation('Do you really want to destroy all webhooks for sandbox driver?', 'yes');;
+            ->expectsConfirmation('Do you really want to destroy all webhooks for sandbox driver?', 'yes');
     }
 
     /**
      * @test
+     *
      * @define-env useConektaDriver
      */
     public function a_webhook_command_its_not_available_for_sandbox()
@@ -59,6 +62,7 @@ class WebhookCommandTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env useConektaDriver
      */
     public function a_webhook_command_for_conekta_creates_an_endpoint()
@@ -70,6 +74,7 @@ class WebhookCommandTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env useConektaDriver
      */
     public function a_webhook_command_list_all_the_webhooks_for_conekta_driver()
@@ -83,12 +88,13 @@ class WebhookCommandTest extends TestCase
                 'id' => 'webhook_0123456789',
                 'status' => 'connected',
                 'url' => 'http://laravel-pay.test/pay/webhooks',
-                'production' => '❎'
+                'production' => '❎',
             ]])->assertExitCode(Command::SUCCESS);
     }
 
     /**
      * @test
+     *
      * @define-env useConektaDriver
      */
     public function a_webhook_command_for_conekta_destroy_all_endpoints()
@@ -104,6 +110,7 @@ class WebhookCommandTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env useStripeDriver
      */
     public function a_webhook_command_for_stripe_creates_an_endpoint()
@@ -115,6 +122,7 @@ class WebhookCommandTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env useStripeDriver
      */
     public function a_webhook_command_list_all_the_webhooks_for_stripe_driver()
@@ -126,6 +134,7 @@ class WebhookCommandTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env useStripeDriver
      */
     public function a_webhook_command_for_stripe_destroy_all_endpoints()

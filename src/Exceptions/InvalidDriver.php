@@ -13,6 +13,6 @@ class InvalidDriver extends Exception
 
     public static function customerRequireDriver($customer): static
     {
-        return new static(class_basename($customer) . ' requires to set a driver before requested.');
+        return new static(class_basename($customer).' requires to set a driver before requested.');
     }
 }

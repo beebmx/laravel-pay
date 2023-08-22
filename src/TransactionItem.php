@@ -3,6 +3,7 @@
 namespace Beebmx\LaravelPay;
 
 use Beebmx\LaravelPay\Database\Factories\TransactionItemFactory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,10 +20,8 @@ class TransactionItem extends Model
 
     /**
      * Create a new factory instance for the model.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
-    protected static function newFactory()
+    protected static function newFactory(): Factory
     {
         return TransactionItemFactory::new();
     }

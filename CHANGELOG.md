@@ -2,6 +2,11 @@
 
 All notable changes to `Laravel Pay` will be documented in this file.
 
+## 0.6.0 - 2023-08-22
+
+- Added support for Laravel 10.x
+- Update files with `Laravel Pint`
+
 ## 0.5.1 - 2022-08-20
 
 - Fixed an issue with transactions

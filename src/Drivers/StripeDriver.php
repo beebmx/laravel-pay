@@ -6,7 +6,6 @@ use Beebmx\LaravelPay\Discount;
 use Beebmx\LaravelPay\Elements\Customer as PayCustomer;
 use Beebmx\LaravelPay\Elements\PaymentMethod;
 use Beebmx\LaravelPay\Pay;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Stripe\Stripe;
 use Stripe\StripeClient;
@@ -53,7 +52,7 @@ class StripeDriver extends Driver
     public function addPaymentMethod($paymentMethod, $customerId = null, $type = 'card'): object
     {
         return $this->retrivePaymentMethod($paymentMethod)
-                    ->attach(['customer' => $customerId]);
+            ->attach(['customer' => $customerId]);
     }
 
     public static function getPaymentType($paymentMethod)
@@ -87,7 +86,7 @@ class StripeDriver extends Driver
         return $this->stripe()->paymentMethods->create([
             'type' => 'card',
             'card' => [
-                'token' => $token
+                'token' => $token,
             ],
         ]);
     }
@@ -97,10 +96,10 @@ class StripeDriver extends Driver
         return (object) [
             'payment_method_types' => ['oxxo'],
             'payment_method_options' => [
-                'oxxo' =>[
-                    'expires_after_days' => (int) config('pay.oxxo.days_to_expire')
-                ]
-            ]
+                'oxxo' => [
+                    'expires_after_days' => (int) config('pay.oxxo.days_to_expire'),
+                ],
+            ],
         ];
     }
 
@@ -135,20 +134,19 @@ class StripeDriver extends Driver
     public function webhookList(string $url): array
     {
         return $this->getWebhooksList()
-            ->map(fn($webhook) => [
+            ->map(fn ($webhook) => [
                 'id' => $webhook['id'],
                 'status' => $webhook['status'],
                 'url' => $webhook['url'],
-                'production' => $webhook['livemode'] ? '✅' : '❎'
+                'production' => $webhook['livemode'] ? '✅' : '❎',
             ])->toArray();
     }
 
     public function webhookDestroy(string $url): void
     {
         $this->getWebhooksList($url)
-            ->filter(fn($webhook) => $webhook['url'] === $url)
-            ->each(fn($webhook) =>
-                $this->stripe()->webhookEndpoints->delete($webhook['id'], [])
+            ->filter(fn ($webhook) => $webhook['url'] === $url)
+            ->each(fn ($webhook) => $this->stripe()->webhookEndpoints->delete($webhook['id'], [])
             );
     }
 
@@ -201,7 +199,7 @@ class StripeDriver extends Driver
                     'postal_code' => $address->postal_code,
                     'country' => $address->country,
                 ])->filter(function ($value) {
-                    return !empty($value);
+                    return ! empty($value);
                 })->toArray(),
                 'name' => $customer->name,
             ],
@@ -234,7 +232,7 @@ class StripeDriver extends Driver
 
     protected function getWebhooksList(): Collection
     {
-        $response =  $this->stripe()->webhookEndpoints->all();
+        $response = $this->stripe()->webhookEndpoints->all();
 
         return Collection::make($response->data);
     }
@@ -243,7 +241,7 @@ class StripeDriver extends Driver
     {
         return new StripeClient(array_merge([
             'api_key' => config('pay.drivers.stripe.secret'),
-            'stripe_version' => static::DRIVER_VERSION
+            'stripe_version' => static::DRIVER_VERSION,
         ], $options));
     }
 }

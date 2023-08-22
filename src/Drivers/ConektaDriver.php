@@ -52,7 +52,7 @@ class ConektaDriver extends Driver
     {
         return $this->asCustomer($customerId)
             ->createPaymentSource([
-                'type'     => $type,
+                'type' => $type,
                 'token_id' => $paymentMethod,
             ]);
     }
@@ -79,8 +79,8 @@ class ConektaDriver extends Driver
         return (object) [
             'type' => 'oxxo_cash',
             'expires_at' => Carbon::now()
-                                ->addDays((int) config('pay.oxxo.days_to_expire'))
-                                ->timestamp
+                ->addDays((int) config('pay.oxxo.days_to_expire'))
+                                ->timestamp,
         ];
     }
 
@@ -121,19 +121,19 @@ class ConektaDriver extends Driver
     public function webhookList(string $url): array
     {
         return $this->getWebhooksList($url)
-            ->map(fn($webhook) => [
+            ->map(fn ($webhook) => [
                 'id' => $webhook['id'],
                 'status' => $webhook['status'],
                 'url' => $webhook['url'],
-                'production' => $webhook['production_enabled'] ? '✅' : '❎'
+                'production' => $webhook['production_enabled'] ? '✅' : '❎',
             ])->toArray();
     }
 
     public function webhookDestroy(string $url): void
     {
         $this->getWebhooksList($url)
-            ->filter(fn($webhook) => $webhook['url'] === $url)
-            ->each(function($webhook) use ($url) {
+            ->filter(fn ($webhook) => $webhook['url'] === $url)
+            ->each(function ($webhook) use ($url) {
                 Http::withHeaders([
                     'Accept' => 'application/vnd.conekta-v2.0.0+json',
                     'Authorization' => $this->getAuthorization(),
@@ -150,11 +150,11 @@ class ConektaDriver extends Driver
         if ($this->isNotConektaCustomer($customer->asDriver())) {
             return [
                 'customer_info' => Collection::make([
-                    "name" => $customer->name,
-                    "email" => $customer->email,
-                    "phone" => $customer->phone,
+                    'name' => $customer->name,
+                    'email' => $customer->email,
+                    'phone' => $customer->phone,
                 ])->filter(function ($value) {
-                    return !empty($value);
+                    return ! empty($value);
                 })->toArray(),
             ];
         }
@@ -188,7 +188,7 @@ class ConektaDriver extends Driver
         return [
             'payment_method' => [
                 'type' => $paymentMethod->type,
-                'payment_source_id' => $paymentMethod->id
+                'payment_source_id' => $paymentMethod->id,
             ],
         ];
     }
@@ -209,7 +209,7 @@ class ConektaDriver extends Driver
                     'postal_code' => $address->postal_code,
                     'country' => $address->country,
                 ])->filter(function ($value) {
-                    return !empty($value);
+                    return ! empty($value);
                 })->toArray(),
             ],
         ];
@@ -226,7 +226,7 @@ class ConektaDriver extends Driver
                 'type' => 'coupon',
                 'amount' => $this->preparePrice($discount->amount),
                 'code' => $discount->code ?? Str::random(),
-            ]]
+            ]],
         ];
     }
 
@@ -262,12 +262,12 @@ class ConektaDriver extends Driver
 
     protected function getAuthorization(): string
     {
-        return 'Basic ' . base64_encode(config('pay.drivers.conekta.secret'));
+        return 'Basic '.base64_encode(config('pay.drivers.conekta.secret'));
     }
 
     protected function getWebhooksList($url): Collection
     {
-        $response =  Http::withHeaders([
+        $response = Http::withHeaders([
             'Accept' => 'application/vnd.conekta-v2.0.0+json',
             'Authorization' => $this->getAuthorization(),
             'Content-Type' => 'application/json',

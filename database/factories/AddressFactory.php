@@ -4,11 +4,7 @@ namespace Beebmx\LaravelPay\Database\Factories;
 
 use Beebmx\LaravelPay\Address;
 use Beebmx\LaravelPay\Pay;
-use Beebmx\LaravelPay\Tests\Fixtures\User;
-use Beebmx\LaravelPay\Transaction;
-use Beebmx\LaravelPay\TransactionItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 class AddressFactory extends Factory
 {

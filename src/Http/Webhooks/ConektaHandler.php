@@ -8,14 +8,14 @@ class ConektaHandler
 {
     use HasWebhookHandler;
 
-    public function handleOrderPaid(array $payload)
+    public function handleOrderPaid(array $payload): void
     {
         $transaction = $this->find($this->getPaymentId($payload));
 
         $transaction?->paid();
     }
 
-    public function handleOrderCanceled(array $payload)
+    public function handleOrderCanceled(array $payload): void
     {
         $transaction = $this->find($this->getPaymentId($payload));
 

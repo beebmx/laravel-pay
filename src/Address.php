@@ -3,8 +3,10 @@
 namespace Beebmx\LaravelPay;
 
 use Beebmx\LaravelPay\Database\Factories\AddressFactory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Address extends Model
@@ -17,14 +19,14 @@ class Address extends Model
         'user_id' => 'integer',
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         $customer = Pay::$customerModel;
 
         return $this->belongsTo($customer, (new $customer)->getForeignKey());
     }
 
-    public function asString()
+    public function asString(): string
     {
         $address[] = "{$this->line1} {$this->line2}";
 
@@ -47,17 +49,15 @@ class Address extends Model
         return implode("\n", $address);
     }
 
-    public function asHtml($use_xhtml = true)
+    public function asHtml($use_xhtml = true): string
     {
         return nl2br($this->asString(), $use_xhtml);
     }
 
     /**
      * Create a new factory instance for the model.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
-    protected static function newFactory()
+    protected static function newFactory(): Factory
     {
         return AddressFactory::new();
     }

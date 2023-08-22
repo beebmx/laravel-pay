@@ -18,6 +18,7 @@ class FactoryTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env useSandboxDriver
      */
     public function it_returns_the_default_driver()
@@ -30,6 +31,7 @@ class FactoryTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env useInvalidDriver
      */
     public function it_throws_an_exception_when_default_driver_is_invalid()
@@ -41,6 +43,7 @@ class FactoryTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env useDriverWithNoClass
      */
     public function it_throws_an_exception_when_driver_has_not_driver_class()
@@ -52,6 +55,7 @@ class FactoryTest extends TestCase
 
     /**
      * @test
+     *
      ** @define-env useSandboxDriver
      */
     public function it_returns_an_instance_of_different_default_driver()
@@ -64,6 +68,7 @@ class FactoryTest extends TestCase
 
     /**
      * @test
+     *
      * @define-env useDrivers
      */
     public function it_returns_all_the_driver_classes_available()

@@ -51,7 +51,7 @@ class Factory
     public static function getDriversClasses(): array
     {
         return collect(self::getDrivers())
-            ->map(fn($driver) => $driver['driver'])
+            ->map(fn ($driver) => $driver['driver'])
             ->toArray();
     }
 

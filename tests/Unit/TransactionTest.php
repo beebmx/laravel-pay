@@ -41,10 +41,10 @@ class TransactionTest extends FeatureTestCase
     /** @test */
     public function it_find_a_transaction_and_returns_it()
     {
-        $payment_id = 'ord_' . Str::random(17);
+        $payment_id = 'ord_'.Str::random(17);
         $transaction = Transaction::factory()->create(['service_payment_id' => $payment_id]);
 
         $this->assertEquals($transaction->fresh(), Transaction::findByPaymentId($payment_id));
-        $this->assertNull(Transaction::findByPaymentId('ord_' . Str::random(17)));
+        $this->assertNull(Transaction::findByPaymentId('ord_'.Str::random(17)));
     }
 }

@@ -3,8 +3,11 @@
 namespace Beebmx\LaravelPay;
 
 use Beebmx\LaravelPay\Database\Factories\TransactionFactory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
 class Transaction extends Model
@@ -24,21 +27,21 @@ class Transaction extends Model
         'payload' => 'array',
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         $customer = Pay::$customerModel;
 
         return $this->belongsTo($customer, (new $customer)->getForeignKey());
     }
 
-    public function items()
+    public function items(): HasMany
     {
         return $this->hasMany(Pay::$transactionItemModel);
     }
 
     public function addItems($products): static
     {
-        Collection::make($products)->each(function($product) {
+        Collection::make($products)->each(function ($product) {
             $this->items()->create([
                 'name' => $product->name,
                 'price' => $product->price,
@@ -79,10 +82,8 @@ class Transaction extends Model
 
     /**
      * Create a new factory instance for the model.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
-    protected static function newFactory()
+    protected static function newFactory(): Factory
     {
         return TransactionFactory::new();
     }

@@ -29,9 +29,6 @@ abstract class Driver implements Driverable
 
     /**
      * Parse the amount for the service
-     *
-     * @param $amount
-     * @return int|float
      */
     public function preparePrice($amount): int|float
     {
@@ -40,9 +37,6 @@ abstract class Driver implements Driverable
 
     /**
      * Get the real amount
-     *
-     * @param $amount
-     * @return float
      */
     public function parsePrice($amount): float
     {

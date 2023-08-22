@@ -30,7 +30,7 @@ class Webhook extends Command
         $driver = new (Factory::make($service));
 
         return match (true) {
-            !$destroy && !$list => $this->createWebhook($driver, $url),
+            ! $destroy && ! $list => $this->createWebhook($driver, $url),
             $list => $this->listWebhooks($driver, $url),
             $destroy => $this->destroyWebhooks($driver, $url),
         };

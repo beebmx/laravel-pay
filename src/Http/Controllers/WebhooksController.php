@@ -5,8 +5,8 @@ namespace Beebmx\LaravelPay\Http\Controllers;
 use Beebmx\LaravelPay\Events\WebhookHandled;
 use Beebmx\LaravelPay\Events\WebhookReceived;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
 
 class WebhooksController
 {
@@ -33,7 +33,7 @@ class WebhooksController
 
     public function eventToMethod($event)
     {
-        return 'handle' . Str::studly(str_replace('.', '_', $event));
+        return 'handle'.Str::studly(str_replace('.', '_', $event));
     }
 
     protected function successMethod($payload = [])
@@ -48,7 +48,7 @@ class WebhooksController
 
     protected function hasHandler(): bool
     {
-        return !!$this->getCurrentHandler();
+        return (bool) $this->getCurrentHandler();
     }
 
     protected function getCurrentWebhookDriver(): ?array

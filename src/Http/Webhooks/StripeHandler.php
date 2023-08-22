@@ -8,7 +8,7 @@ class StripeHandler
 {
     use HasWebhookHandler;
 
-    public function handlePaymentIntentSucceeded(array $payload)
+    public function handlePaymentIntentSucceeded(array $payload): void
     {
         $status = $this->getPayloadStatus($payload);
         $transaction = $this->find($this->getPaymentId($payload));
@@ -20,7 +20,7 @@ class StripeHandler
         }
     }
 
-    public function handlePaymentIntentCanceled(array $payload)
+    public function handlePaymentIntentCanceled(array $payload): void
     {
         $transaction = $this->find($this->getPaymentId($payload));
         $transaction?->canceled();

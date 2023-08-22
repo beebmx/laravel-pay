@@ -20,38 +20,36 @@ class Pay
 
     /**
      * Disable migrations for Pay
-     *
-     * @return static
      */
-    public static function ignoreMigrations()
+    public static function ignoreMigrations(): static
     {
         static::$runsMigrations = false;
 
         return new static;
     }
 
-    public static function useCustomerModel($customerModel)
+    public static function useCustomerModel($customerModel): void
     {
         static::$customerModel = $customerModel;
     }
 
-    public static function useAddressModel($addressModel)
+    public static function useAddressModel($addressModel): void
     {
         static::$addressModel = $addressModel;
     }
 
-    public static function useTransactionModel($transactionModel)
+    public static function useTransactionModel($transactionModel): void
     {
         static::$transactionModel = $transactionModel;
     }
 
-    public static function useTransactionItemModel($transactionItemModel)
+    public static function useTransactionItemModel($transactionItemModel): void
     {
         static::$transactionItemModel = $transactionItemModel;
     }
 
-    public static function getWebhookspath()
+    public static function getWebhookspath(): string
     {
-        return config('pay.path') . '/' . config('pay.webhooks');
+        return config('pay.path').'/'.config('pay.webhooks');
     }
 }

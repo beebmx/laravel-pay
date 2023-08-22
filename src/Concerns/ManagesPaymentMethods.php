@@ -12,12 +12,12 @@ trait ManagesPaymentMethods
 
     public function hasDefaultPayment(): bool
     {
-        return !is_null($this->service_payment_id);
+        return ! is_null($this->service_payment_id);
     }
 
     public function getDefaultPayment(): ?PaymentMethod
     {
-        if (!$this->hasDefaultPayment()) {
+        if (! $this->hasDefaultPayment()) {
             return null;
         }
 
@@ -37,7 +37,7 @@ trait ManagesPaymentMethods
             ->driver()
             ->addPaymentMethod($paymentMethod, $this->service_customer_id);
 
-        if (!$this->hasDefaultPayment()) {
+        if (! $this->hasDefaultPayment()) {
             $this->fillPaymentMethodFields($driverPaymentMethod);
         }
 
@@ -60,17 +60,17 @@ trait ManagesPaymentMethods
 
     public function hasOneTimePaymentMethod(): bool
     {
-        return !is_null($this->oneTimeTokenPaymentMethod) || !is_null($this->oxxoPaymentMethod);
+        return ! is_null($this->oneTimeTokenPaymentMethod) || ! is_null($this->oxxoPaymentMethod);
     }
 
     public function hasOneTimeTokenPaymentMethod(): bool
     {
-        return !is_null($this->oneTimeTokenPaymentMethod);
+        return ! is_null($this->oneTimeTokenPaymentMethod);
     }
 
     public function hasOxxoPaymentMethod(): bool
     {
-        return !is_null($this->oxxoPaymentMethod);
+        return ! is_null($this->oxxoPaymentMethod);
     }
 
     public function getOneTimeTokenPaymentMethod(): ?PaymentMethod

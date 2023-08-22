@@ -57,7 +57,6 @@ return [
         'days_to_expire' => env('CONEKTA_OXXO_EXPIRES_AT', 30),
     ],
 
-
     /*
     |--------------------------------------------------------------------------
     | Currency
@@ -67,6 +66,6 @@ return [
     |
     */
 
-    'currency' => env('PAY_CURRENCY', 'usd')
+    'currency' => env('PAY_CURRENCY', 'usd'),
 
 ];

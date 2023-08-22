@@ -12,7 +12,7 @@ trait ManagesFactories
      */
     public function getCustomerDriver()
     {
-        if (!$this->service) {
+        if (! $this->service) {
             throw InvalidDriver::customerRequireDriver($this);
         }
 

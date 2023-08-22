@@ -10,7 +10,7 @@ trait ManageCustomer
 {
     public function isCustomer(): bool
     {
-        return !is_null($this->service_customer_id);
+        return ! is_null($this->service_customer_id);
     }
 
     /**
@@ -27,7 +27,7 @@ trait ManageCustomer
     {
         $options = $this->getCustomerOptions($options);
 
-        return new Customer($this, tap($this->replicate(), function($user) use ($options) {
+        return new Customer($this, tap($this->replicate(), function ($user) use ($options) {
             $user->id = null;
             $user->name = $options['name'];
             $user->email = $options['email'];
@@ -70,7 +70,7 @@ trait ManageCustomer
         return $this->phone;
     }
 
-    protected function getCustomerOptions(array $options = []) :array
+    protected function getCustomerOptions(array $options = []): array
     {
         if (! array_key_exists('name', $options) && $name = $this->driverName()) {
             $options['name'] = $name;
@@ -92,7 +92,7 @@ trait ManageCustomer
      */
     protected function hasValidCustomerDriver(): void
     {
-        if (!$this->isCustomer()) {
+        if (! $this->isCustomer()) {
             throw InvalidCustomer::exists($this);
         }
     }

@@ -14,7 +14,7 @@ class ConektaTest extends FeatureTestCase
 {
     protected function setUp(): void
     {
-        if ((getenv('PAY_TEST_FULL_SUITE') === '(false)' || !getenv('PAY_TEST_FULL_SUITE')) || !getenv('CONEKTA_SECRET_KEY')) {
+        if ((getenv('PAY_TEST_FULL_SUITE') === '(false)' || ! getenv('PAY_TEST_FULL_SUITE')) || ! getenv('CONEKTA_SECRET_KEY')) {
             $this->markTestSkipped('Conekta Test are skipped');
         }
 
@@ -84,10 +84,10 @@ class ConektaTest extends FeatureTestCase
 
         $user->charge([[
             'name' => 'Product 01',
-            'price' => 100
+            'price' => 100,
         ], [
             'name' => 'Product 02',
-            'price' => 200
+            'price' => 200,
         ]]);
 
         $this->assertCount(1, Transaction::all());

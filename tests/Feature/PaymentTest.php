@@ -70,7 +70,7 @@ class PaymentTest extends FeatureTestCase
 
         $user->charge([
             'name' => 'Testing product',
-            'price' => 500
+            'price' => 500,
         ]);
 
         $this->assertCount(1, Transaction::all());
@@ -85,10 +85,10 @@ class PaymentTest extends FeatureTestCase
 
         $user->charge([[
             'name' => 'Product 01',
-            'price' => 100
+            'price' => 100,
         ], [
             'name' => 'Product 02',
-            'price' => 200
+            'price' => 200,
         ]]);
 
         $this->assertCount(2, TransactionItem::all());
@@ -101,7 +101,7 @@ class PaymentTest extends FeatureTestCase
 
         $payment = $user->charge([
             'name' => 'Product 01',
-            'price' => 100
+            'price' => 100,
         ]);
 
         $this->assertInstanceOf(Transaction::class, $payment->getTransaction());

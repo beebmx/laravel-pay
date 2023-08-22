@@ -3,7 +3,6 @@
 namespace Beebmx\LaravelPay\Tests\Feature;
 
 use Beebmx\LaravelPay\Http\Webhooks\ConektaHandler;
-use Beebmx\LaravelPay\Pay;
 use Beebmx\LaravelPay\Tests\FeatureTestCase;
 use Beebmx\LaravelPay\Transaction;
 use Illuminate\Support\Carbon;
@@ -14,7 +13,7 @@ class WebhookConektaHandlerTest extends FeatureTestCase
     /** @test */
     public function an_order_paid_mark_as_paid_the_transaction()
     {
-        $id = 'ord_' . Str::random(17);
+        $id = 'ord_'.Str::random(17);
         $transaction = Transaction::factory()->create(['service_payment_id' => $id, 'status' => 'pending']);
 
         (new ConektaHandler)->handleOrderPaid($this->mockResponse($id));
@@ -25,7 +24,7 @@ class WebhookConektaHandlerTest extends FeatureTestCase
     /** @test */
     public function an_order_canceled_mark_as_cancel_the_transaction()
     {
-        $id = 'ord_' . Str::random(17);
+        $id = 'ord_'.Str::random(17);
         $transaction = Transaction::factory()->create(['service_payment_id' => $id, 'status' => 'paid']);
 
         (new ConektaHandler)->handleOrderCanceled($this->mockResponse($id));
@@ -41,7 +40,7 @@ class WebhookConektaHandlerTest extends FeatureTestCase
 
     protected function mockResponse(string $id, string $status = 'paid')
     {
-        $cus = 'cus_' . Str::random(17);
+        $cus = 'cus_'.Str::random(17);
 
         return [
             'livemode' => false,
@@ -54,7 +53,7 @@ class WebhookConektaHandlerTest extends FeatureTestCase
                 'name' => 'John Doe',
                 'corporate' => false,
                 'customer_id' => $cus,
-                'object' => 'customer_info'
+                'object' => 'customer_info',
             ],
             'object' => 'order',
             'id' => $id,
@@ -71,12 +70,12 @@ class WebhookConektaHandlerTest extends FeatureTestCase
                         'unit_price' => 50000,
                         'quantity' => 1,
                         'object' => 'line_item',
-                        'id' => 'line_item_' . Str::random(17),
+                        'id' => 'line_item_'.Str::random(17),
                         'parent_id' => $id,
                         'metadata' => [],
-                        'antifraud_info' => []
-                    ]
-                ]
+                        'antifraud_info' => [],
+                    ],
+                ],
             ],
             'charges' => [
                 'object' => 'list',
@@ -101,7 +100,7 @@ class WebhookConektaHandlerTest extends FeatureTestCase
                             'issuer' => 'bank_brand',
                             'account_type' => 'BANK',
                             'country' => 'US',
-                            'fraud_indicators' => []
+                            'fraud_indicators' => [],
                         ],
                         'object' => 'charge',
                         'description' => 'Payment from order',
@@ -110,10 +109,10 @@ class WebhookConektaHandlerTest extends FeatureTestCase
                         'paid_at' => Carbon::now()->timestamp,
                         'fee' => 1972,
                         'customer_id' => $cus,
-                        'order_id' => $id
-                    ]
-                ]
-            ]
+                        'order_id' => $id,
+                    ],
+                ],
+            ],
 
         ];
     }

@@ -15,7 +15,7 @@ trait ManagesDiscounts
         return $this;
     }
 
-    public function getDiscount()
+    public function getDiscount(): Discount
     {
         if (is_float($this->paymentDiscount) || is_int($this->paymentDiscount)) {
             return new Discount((float) $this->paymentDiscount);
