@@ -20,7 +20,7 @@ interface Driverable
 
     public function findPaymentMethod(string $paymentMethod, $customerId = null, $type = 'card'): object;
 
-    public function token(string $token): object;
+    public function token(string $token, Customer $customer): object;
 
     /**
      * @param  null  $address

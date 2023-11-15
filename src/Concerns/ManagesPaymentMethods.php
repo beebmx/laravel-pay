@@ -46,7 +46,11 @@ trait ManagesPaymentMethods
 
     public function token(string $token): static
     {
-        $this->oneTimeTokenPaymentMethod = new PaymentMethod($this, $this->driver()->token($token));
+        $customer = ! $this->isCustomer()
+            ? $this->asAnonymousCustomer()
+            : $this->asCustomer();
+
+        $this->oneTimeTokenPaymentMethod = new PaymentMethod($this, $this->driver()->token($token, $customer));
 
         return $this;
     }

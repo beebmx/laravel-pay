@@ -1,6 +1,10 @@
 # Changelog
 
-All notable changes to `Laravel Pay` will be documented in this file.
+All notable changes to `Payments for Laravel` will be documented in this file.
+
+## 0.6.1 - 2023-11-15
+
+- Update StripeDriver
 
 ## 0.6.0 - 2023-08-22
 

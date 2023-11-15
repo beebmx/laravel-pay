@@ -116,8 +116,8 @@ trait PerformsPayments
         return match (true) {
             ! is_null($paymentMethod->id) => $paymentMethod->id,
             ! is_null($paymentMethod->token) => $paymentMethod->token,
-            ! is_null($payment->oxxo_reference) => $payment->oxxo_reference,
-            ! is_null($payment->oxxo_secret) => $payment->oxxo_secret
+            isset($payment->oxxo_reference) => $payment->oxxo_reference,
+            isset($payment->oxxo_secret) => $payment->oxxo_secret,
         };
     }
 }

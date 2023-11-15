@@ -54,7 +54,7 @@ class SandboxDriver extends Driver
         return (object) $this->preparePaymentMethod($paymentMethod, $customerId);
     }
 
-    public function token(string $token): object
+    public function token(string $token, Customer $customer): object
     {
         return (object) [
             'token_id' => $token,

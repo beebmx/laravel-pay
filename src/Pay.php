@@ -4,11 +4,11 @@ namespace Beebmx\LaravelPay;
 
 class Pay
 {
-    const VERSION = '0.5.1';
+    const VERSION = '0.6.1';
 
-    public static $runsMigrations = true;
+    public static bool $runsMigrations = true;
 
-    public static $registersRoutes = true;
+    public static bool $registersRoutes = true;
 
     public static $customerModel = 'App\\Models\\User';
 

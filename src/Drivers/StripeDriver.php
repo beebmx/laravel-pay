@@ -81,13 +81,18 @@ class StripeDriver extends Driver
         });
     }
 
-    public function token(string $token): object
+    public function token(string $token, PayCustomer $customer): object
     {
         return $this->stripe()->paymentMethods->create([
             'type' => 'card',
             'card' => [
                 'token' => $token,
             ],
+            'billing_details' => [
+                'email' => $customer?->email,
+                'name' => $customer?->name,
+                'phone' => $customer?->phone,
+            ]
         ]);
     }
 

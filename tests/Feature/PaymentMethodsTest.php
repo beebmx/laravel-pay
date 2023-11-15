@@ -59,7 +59,7 @@ class PaymentMethodsTest extends FeatureTestCase
     /** @test */
     public function a_one_time_payment_method_exists_or_not()
     {
-        $user = new User;
+        $user = User::factory()->create();
         $this->assertFalse($user->hasOneTimePaymentMethod());
 
         $user->token('token_123');
@@ -69,7 +69,7 @@ class PaymentMethodsTest extends FeatureTestCase
     /** @test */
     public function an_one_time_token_payment_method_is_returned_if_exists()
     {
-        $user = new User;
+        $user = User::factory()->create();
         $this->assertNull($user->getOneTimeTokenPaymentMethod());
 
         $user->token('token_123');
@@ -79,7 +79,7 @@ class PaymentMethodsTest extends FeatureTestCase
     /** @test */
     public function an_oxxo_payment_method_is_returned_if_exists()
     {
-        $user = new User;
+        $user = User::factory()->create();
         $this->assertNull($user->getOxxoPaymentMethod());
 
         $user->oxxo();

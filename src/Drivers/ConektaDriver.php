@@ -65,7 +65,7 @@ class ConektaDriver extends Driver
             });
     }
 
-    public function token(string $token): object
+    public function token(string $token, PayCustomer $customer): object
     {
         return (object) [
             'type' => 'card',
