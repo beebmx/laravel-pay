@@ -55,10 +55,6 @@ class PayServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../database/migrations' => $this->app->databasePath('migrations'),
             ], 'pay-migrations');
-
-            //            $this->publishes([
-            //                __DIR__.'/../resources/views' => $this->app->resourcePath('views/vendor/pay'),
-            //            ], 'pay-views');
         }
     }
 

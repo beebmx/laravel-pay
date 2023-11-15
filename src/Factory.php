@@ -2,12 +2,16 @@
 
 namespace Beebmx\LaravelPay;
 
+use Beebmx\LaravelPay\Drivers\Driver;
 use Beebmx\LaravelPay\Exceptions\DriverNonInstantiable;
 use Beebmx\LaravelPay\Exceptions\InvalidDriver;
+use Illuminate\Support\Collection;
 
 class Factory
 {
     /**
+     * @return Driver
+     *
      * @throws DriverNonInstantiable
      * @throws InvalidDriver
      */
@@ -50,7 +54,7 @@ class Factory
 
     public static function getDriversClasses(): array
     {
-        return collect(self::getDrivers())
+        return Collection::make(self::getDrivers())
             ->map(fn ($driver) => $driver['driver'])
             ->toArray();
     }

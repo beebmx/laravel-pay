@@ -6,7 +6,8 @@ use Beebmx\LaravelPay\Elements\Payment;
 use Beebmx\LaravelPay\Elements\PaymentMethod;
 use Beebmx\LaravelPay\Exceptions\InvalidPayment;
 use Beebmx\LaravelPay\Exceptions\InvalidPaymentMethod;
-use Beebmx\LaravelPay\Product;
+use Beebmx\LaravelPay\PurchaseItem;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 trait PerformsPayments
@@ -18,10 +19,10 @@ trait PerformsPayments
      * @throws \Beebmx\LaravelPay\Exceptions\InvalidCustomer
      * @throws \Beebmx\LaravelPay\Exceptions\InvalidDriver
      */
-    public function charge(array $product, PaymentMethod $paymentMethod = null, array $options = []): Payment
+    public function charge(array $purchase, PaymentMethod $paymentMethod = null, array $options = []): Payment
     {
-        if (empty($product)) {
-            throw InvalidPayment::product();
+        if (empty($purchase)) {
+            throw InvalidPayment::purchase();
         }
 
         $paymentMethod = match (true) {
@@ -34,10 +35,10 @@ trait PerformsPayments
             throw InvalidPaymentMethod::exists();
         }
 
-        $products = $this->isProduct($product)
-            ? [$this->parseProduct($product)]
-            : Collection::make($product)->map(function ($item) {
-                return $this->parseProduct($item);
+        $purchases = $this->isPurchase($purchase)
+            ? [$this->parsePurchase($purchase)]
+            : Collection::make($purchase)->map(function ($item) {
+                return $this->parsePurchase($item);
             })->values()->all();
 
         $paymentMethod = $this->getPaymentMethod($paymentMethod);
@@ -49,7 +50,7 @@ trait PerformsPayments
         $payment = $this->driver()->charge(
             $customer,
             $paymentMethod,
-            $products,
+            $purchases,
             $this->getDiscount(),
             $this->currentShippingAddress(),
             $options
@@ -70,7 +71,7 @@ trait PerformsPayments
             'shipping' => $this->currentShippingAddress()?->asString(),
         ]);
 
-        $transaction->addItems($products);
+        $transaction->addItems($purchases);
 
         if ($this->hasShipping()) {
             $this->shipping(null);
@@ -81,25 +82,30 @@ trait PerformsPayments
         });
     }
 
-    protected function isProduct(array $product): bool
+    protected function isPurchase(array $purchase): bool
     {
-        return Collection::make($product)->first(function ($item) {
+        return Collection::make($purchase)->first(function ($item) {
             return is_array($item);
         }) === null;
     }
 
-    protected function parseProduct(array $product): Product
+    protected function parsePurchase(array $purchase): PurchaseItem
     {
-        if (! $this->isProductValid($product)) {
-            throw InvalidPayment::price($product);
+        if (! $this->isPurchaseValid($purchase)) {
+            throw InvalidPayment::price($purchase);
         }
 
-        return new Product($product['name'], $product['price'], $product['quantity'] ?? 1);
+        return new PurchaseItem(
+            name: $purchase['name'],
+            price: $purchase['price'],
+            quantity: $purchase['quantity'] ?? 1,
+            model: $this->prepareModel($purchase['model'] ?? null)
+        );
     }
 
-    protected function isProductValid(array $product): bool
+    protected function isPurchaseValid(array $purchase): bool
     {
-        return array_key_exists('price', $product);
+        return array_key_exists('price', $purchase);
     }
 
     protected function getPaymentMethod(PaymentMethod|string|null $paymentMethod): PaymentMethod
@@ -119,5 +125,18 @@ trait PerformsPayments
             isset($payment->oxxo_reference) => $payment->oxxo_reference,
             isset($payment->oxxo_secret) => $payment->oxxo_secret,
         };
+    }
+
+    protected function prepareModel(Model|int|null $model): ?int
+    {
+        if ($model instanceof Model) {
+            return $model->getKey();
+        }
+
+        if (is_int($model)) {
+            return $model;
+        }
+
+        return null;
     }
 }

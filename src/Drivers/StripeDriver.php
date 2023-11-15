@@ -92,7 +92,7 @@ class StripeDriver extends Driver
                 'email' => $customer?->email,
                 'name' => $customer?->name,
                 'phone' => $customer?->phone,
-            ]
+            ],
         ]);
     }
 

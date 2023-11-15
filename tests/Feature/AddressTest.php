@@ -1,36 +1,46 @@
 <?php
 
-namespace Beebmx\LaravelPay\Tests\Feature;
-
 use Beebmx\LaravelPay\Address;
-use Beebmx\LaravelPay\Tests\FeatureTestCase;
 use Beebmx\LaravelPay\Tests\Fixtures\User;
 
-class AddressTest extends FeatureTestCase
-{
-    /** @test */
-    public function an_address_can_be_set_for_shipping()
-    {
-        $user = User::factory()->hasAddresses(4)->create();
-        $user->load('addresses');
+it('returns the address as string', function () {
+    $address = Address::factory()->create(['line2' => 'Apartment 1']);
 
-        $this->assertNull($user->currentShippingAddress());
+    expect($address->asString())
+        ->not->toBeNull()
+        ->toContain('Apartment 1');
+});
 
-        $user->shipping($user->addresses->first());
+it('returns the address as html', function () {
+    $address = Address::factory()->create();
 
-        $this->assertNotNull($user->currentShippingAddress());
-        $this->assertEquals($user->addresses->first(), $user->currentShippingAddress());
-    }
+    expect($address->asHtml())
+        ->not->toBeNull()
+        ->toContain('<br />');
+});
 
-    /** @test */
-    public function it_validates_if_has_an_address_for_shipping()
-    {
-        $user = User::factory()->create();
-        $address = Address::factory()->for($user)->create();
+test('an address can be set for shipping', function () {
+    $user = User::factory()->hasAddresses(4)->create();
+    $user->load('addresses');
 
-        $this->assertFalse($user->hasShipping());
+    expect($user->currentShippingAddress())
+        ->toBeNull();
 
-        $user->shipping($address);
-        $this->assertTrue($user->hasShipping());
-    }
-}
+    $user->shipping($user->addresses->first());
+
+    expect($user->currentShippingAddress())
+        ->not->toBeNull()
+        ->toEqual($user->addresses->first());
+});
+
+it('validates if has an address for shipping', function () {
+    $user = User::factory()->create();
+    $address = Address::factory()->for($user)->create();
+
+    expect($user->hasShipping())
+        ->toBeFalse();
+
+    $user->shipping($address);
+    expect($user->hasShipping())
+        ->toBeTrue();
+});

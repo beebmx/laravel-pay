@@ -1,41 +1,29 @@
 <?php
 
-namespace Beebmx\LaravelPay\Tests\Unit;
-
 use Beebmx\LaravelPay\Exceptions\CustomerAlreadyExists;
 use Beebmx\LaravelPay\Exceptions\InvalidCustomer;
 use Beebmx\LaravelPay\Tests\Fixtures\User;
-use PHPUnit\Framework\TestCase;
 
-class CustomerTest extends TestCase
-{
-    /** @test */
-    public function it_defines_if_a_user_is_set_as_customer()
-    {
-        $user = new User;
-        $this->assertFalse($user->isCustomer());
+it('defines if a user is set as customer', function () {
+    $user = new User;
+    expect($user->isCustomer())
+        ->toBeFalse();
 
-        $user = new User;
-        $user->service_customer_id = 'customer_123';
-        $this->assertTrue($user->isCustomer());
-    }
+    $user = new User;
+    $user->service_customer_id = 'customer_123';
+    expect($user->isCustomer())
+        ->toBeTrue();
+});
 
-    /** @test */
-    public function it_throws_an_exception_if_requires_a_customer_driver_with_an_invalid_user()
-    {
-        $user = new User;
+it('throws an exception if requires a customer driver with an invalid user', function () {
+    $user = new User;
 
-        $this->expectException(InvalidCustomer::class);
-        $user->asCustomer();
-    }
+    $user->asCustomer();
+})->throws(InvalidCustomer::class);
 
-    /** @test */
-    public function it_throws_an_exception_if_a_customer_tries_to_create_an_already_customer()
-    {
-        $user = new User;
-        $user->service_customer_id = 'customer_123';
+it('throws an exception if a customer tries to create an already customer', function () {
+    $user = new User;
+    $user->service_customer_id = 'customer_123';
 
-        $this->expectException(CustomerAlreadyExists::class);
-        $user->createCustomerWithDriver();
-    }
-}
+    $user->createCustomerWithDriver();
+})->throws(CustomerAlreadyExists::class);

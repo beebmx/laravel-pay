@@ -1,214 +1,191 @@
 <?php
 
-namespace Beebmx\LaravelPay\Tests\Feature;
-
 use Beebmx\LaravelPay\Address;
 use Beebmx\LaravelPay\Elements\Customer;
 use Beebmx\LaravelPay\Elements\PaymentMethod;
-use Beebmx\LaravelPay\Tests\FeatureTestCase;
 use Beebmx\LaravelPay\Tests\Fixtures\User;
 use Beebmx\LaravelPay\Transaction;
 use Beebmx\LaravelPay\TransactionItem;
 
-class StripeTest extends FeatureTestCase
-{
-    protected function setUp(): void
-    {
-        if ((getenv('PAY_TEST_FULL_SUITE') === '(false)' || ! getenv('PAY_TEST_FULL_SUITE')) || ! getenv('STRIPE_SECRET_KEY')) {
-            $this->markTestSkipped('Stripe Test are skipped');
-        }
+beforeEach(function () {
+    config(['pay.default' => 'stripe']);
+    config(['pay.currency' => 'mxn']);
+    config(['pay.oxxo.days_to_expire' => 1]);
+})->skip(
+    (getenv('PAY_TEST_FULL_SUITE') === '(false)' || ! getenv('PAY_TEST_FULL_SUITE')) || ! getenv('STRIPE_SECRET_KEY'),
+    'Stripe Test are skipped'
+);
 
-        parent::setUp();
-    }
+test('a customer can be created', function () {
+    $user = User::factory()->create();
 
-    /** @test */
-    public function a_customer_can_be_created()
-    {
-        $user = User::factory()->create();
+    $customer = $user->createCustomerWithDriver();
 
-        $customer = $user->createCustomerWithDriver();
+    expect($user->service)->not->toBeNull()
+        ->toEqual('stripe')
+        ->and($user->service_customer_id)->not->toBeNull()
+        ->and($customer)->toBeObject();
+});
 
-        $this->assertNotNull($user->service);
-        $this->assertEquals('stripe', $user->service);
-        $this->assertNotNull($user->service_customer_id);
-        $this->assertIsObject($customer);
-    }
+test('a customer can be requested as customer driver', function () {
+    $user = User::factory()->create();
+    $user->createCustomerWithDriver();
+    $customer = $user->fresh()->asCustomer();
 
-    /** @test */
-    public function a_customer_can_be_requested_as_customer_driver()
-    {
-        $user = User::factory()->create();
-        $user->createCustomerWithDriver();
-        $customer = $user->fresh()->asCustomer();
+    expect($customer)
+        ->toBeInstanceOf(Customer::class)
+        ->toBeObject();
+});
 
-        $this->assertInstanceOf(Customer::class, $customer);
-        $this->assertIsObject($customer);
-    }
+test('a customer can add a payment method', function () {
+    $user = User::factory()->create();
+    $user->createCustomerWithDriver();
 
-    /** @test */
-    public function a_customer_can_add_a_payment_method()
-    {
-        $user = User::factory()->create();
-        $user->createCustomerWithDriver();
+    $paymentMethod = $user->addPaymentMethod('pm_card_visa');
 
-        $paymentMethod = $user->addPaymentMethod('pm_card_visa');
+    expect($paymentMethod)
+        ->toBeObject();
+});
 
-        $this->assertIsObject($paymentMethod);
-    }
+test('a customer can retrive their default payment method', function () {
+    $user = User::factory()->create();
+    $user->createCustomerWithDriver();
+    $user->addPaymentMethod('pm_card_visa');
 
-    /** @test */
-    public function a_customer_can_retrive_their_default_payment_method()
-    {
-        $user = User::factory()->create();
-        $user->createCustomerWithDriver();
-        $user->addPaymentMethod('pm_card_visa');
+    $paymentMethod = $user->getDefaultPayment();
+    $user = $user->fresh();
 
-        $paymentMethod = $user->getDefaultPayment();
-        $user = $user->fresh();
+    expect($paymentMethod)
+        ->not->toBeNull()
+        ->toBeObject()
+        ->toBeInstanceOf(PaymentMethod::class)
+        ->and($paymentMethod->id)->toEqual($user->service_payment_id);
+});
 
-        $this->assertNotNull($paymentMethod);
-        $this->assertIsObject($paymentMethod);
-        $this->assertInstanceOf(PaymentMethod::class, $paymentMethod);
-        $this->assertEquals($user->service_payment_id, $paymentMethod->id);
-    }
+test('a charge save the transaction and items', function () {
+    $user = User::factory()->create();
+    $user->createCustomerWithDriver();
+    $user->addPaymentMethod('pm_card_visa');
 
-    /** @test */
-    public function a_charge_save_the_transaction_and_items()
-    {
-        $user = User::factory()->create();
-        $user->createCustomerWithDriver();
-        $user->addPaymentMethod('pm_card_visa');
+    expect(Transaction::all())
+        ->toHaveCount(0)
+        ->and(TransactionItem::all())->toHaveCount(0);
 
-        $this->assertCount(0, Transaction::all());
-        $this->assertCount(0, TransactionItem::all());
+    $user->charge([[
+        'name' => 'Product 01',
+        'price' => 100,
+    ], [
+        'name' => 'Product 02',
+        'price' => 200,
+    ]]);
 
-        $user->charge([[
-            'name' => 'Product 01',
-            'price' => 100,
-        ], [
-            'name' => 'Product 02',
-            'price' => 200,
-        ]]);
+    expect(Transaction::all())
+        ->toHaveCount(1)
+        ->and(TransactionItem::all())->toHaveCount(2);
+});
 
-        $this->assertCount(1, Transaction::all());
-        $this->assertCount(2, TransactionItem::all());
-    }
+test('a charge save the address', function () {
+    $user = User::factory()->create();
+    $address = Address::factory()->for($user)->create();
+    $user->createCustomerWithDriver();
+    $user->addPaymentMethod('pm_card_visa');
 
-    /** @test */
-    public function a_charge_save_the_address()
-    {
-        $user = User::factory()->create();
-        $address = Address::factory()->for($user)->create();
-        $user->createCustomerWithDriver();
-        $user->addPaymentMethod('pm_card_visa');
+    $payment = $user
+        ->shipping($address)
+        ->charge(['name' => 'Product 01', 'price' => 500]);
 
-        $payment = $user
-            ->shipping($address)
-            ->charge(['name' => 'Product 01', 'price' => 500]);
+    expect($payment->asDriver())->toHaveKey('shipping')
+        ->and($payment->asDriver()->shipping)->not->toBeNull();
+});
 
-        $this->assertArrayHasKey('shipping', $payment->asDriver());
-        $this->assertNotNull($payment->asDriver()->shipping);
-    }
+test('a charge can have discount', function () {
+    $user = User::factory()->create();
+    $address = Address::factory()->for($user)->create();
+    $user->createCustomerWithDriver();
+    $user->addPaymentMethod('pm_card_visa');
 
-    /** @test */
-    public function a_charge_can_have_discount()
-    {
-        $user = User::factory()->create();
-        $address = Address::factory()->for($user)->create();
-        $user->createCustomerWithDriver();
-        $user->addPaymentMethod('pm_card_visa');
+    $payment = $user
+        ->discount(200)
+        ->charge([
+            'name' => 'Testing product',
+            'price' => 500,
+        ]);
 
-        $payment = $user
-            ->discount(200)
-            ->charge([
-                'name' => 'Testing product',
-                'price' => 500,
-            ]);
+    expect($payment->getTransaction()->total)->not->toBeNull()
+        ->and($payment->getTransaction()->discount)->not->toBeNull()
+        ->and($payment->getTransaction()->amount)->toEqual(300)
+        ->and($payment->getTransaction()->total)->toEqual(500)
+        ->and($payment->getTransaction()->discount)->toEqual(200);
+});
 
-        $this->assertNotNull($payment->getTransaction()->total);
-        $this->assertNotNull($payment->getTransaction()->discount);
-        $this->assertEquals(300, $payment->getTransaction()->amount);
-        $this->assertEquals(500, $payment->getTransaction()->total);
-        $this->assertEquals(200, $payment->getTransaction()->discount);
-    }
+test('a user can create a charge with one time token payment method', function () {
+    $user = User::factory()->create();
+    $user->createCustomerWithDriver();
 
-    /** @test */
-    public function a_user_can_create_a_charge_with_one_time_token_payment_method()
-    {
-        $user = User::factory()->create();
-        $user->createCustomerWithDriver();
+    expect(Transaction::all())
+        ->toHaveCount(0);
 
-        $this->assertCount(0, Transaction::all());
+    $user
+        ->token('tok_visa')
+        ->charge([
+            'name' => 'Testing product',
+            'price' => 500,
+        ]);
 
-        $user
-            ->token('tok_visa')
-            ->charge([
-                'name' => 'Testing product',
-                'price' => 500,
-            ]);
+    expect(Transaction::all())
+        ->toHaveCount(1);
+});
 
-        $this->assertCount(1, Transaction::all());
-    }
+test('an anonymous user can create a charge with one time token payment method', function () {
+    $user = User::factory()->create();
 
-    /** @test */
-    public function an_anonymous_user_can_create_a_charge_with_one_time_token_payment_method()
-    {
-        $user = User::factory()->create();
+    expect(Transaction::all())
+        ->toHaveCount(0);
 
-        $this->assertCount(0, Transaction::all());
+    $user
+        ->token('tok_visa')
+        ->charge([
+            'name' => 'Testing product',
+            'price' => 500,
+        ]);
 
-        $user
-            ->token('tok_visa')
-            ->charge([
-                'name' => 'Testing product',
-                'price' => 500,
-            ]);
+    expect(Transaction::all())
+        ->toHaveCount(1);
+});
 
-        $this->assertCount(1, Transaction::all());
-    }
+test('a user can create a charge with oxxo payment method', function () {
+    $user = User::factory()->create();
+    $user->createCustomerWithDriver();
+    $user->phone = '+520000000000';
 
-    /** @test */
-    public function a_user_can_create_a_charge_with_oxxo_payment_method()
-    {
-        $user = User::factory()->create();
-        $user->createCustomerWithDriver();
-        $user->phone = '+520000000000';
+    expect(Transaction::all())
+        ->toHaveCount(0);
 
-        $this->assertCount(0, Transaction::all());
+    $user
+        ->oxxo()
+        ->charge([
+            'name' => 'Testing product',
+            'price' => 500,
+        ]);
 
-        $user
-            ->oxxo()
-            ->charge([
-                'name' => 'Testing product',
-                'price' => 500,
-            ]);
+    expect(Transaction::all())
+        ->toHaveCount(1);
+});
 
-        $this->assertCount(1, Transaction::all());
-    }
+test('an anonymous user can create a charge with oxxo payment method', function () {
+    $user = User::factory()->create();
+    $user->phone = '+520000000000';
 
-    /** @test */
-    public function an_anonymous_user_can_create_a_charge_with_oxxo_payment_method()
-    {
-        $user = User::factory()->create();
-        $user->phone = '+520000000000';
+    expect(Transaction::all())
+        ->toHaveCount(0);
 
-        $this->assertCount(0, Transaction::all());
+    $user
+        ->oxxo()
+        ->charge([
+            'name' => 'Testing product',
+            'price' => 500,
+        ]);
 
-        $user
-            ->oxxo()
-            ->charge([
-                'name' => 'Testing product',
-                'price' => 500,
-            ]);
-
-        $this->assertCount(1, Transaction::all());
-    }
-
-    protected function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
-        $app['config']->set('pay.default', 'stripe');
-        $app['config']->set('pay.currency', 'mxn');
-        $app['config']->set('pay.oxxo.days_to_expire', 1);
-    }
-}
+    expect(Transaction::all())
+        ->toHaveCount(1);
+});

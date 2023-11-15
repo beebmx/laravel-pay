@@ -8,7 +8,7 @@ class FeatureTestCase extends TestCase
 {
     use RefreshDatabase;
 
-    protected function defineDatabaseMigrations()
+    protected function defineDatabaseMigrations(): void
     {
         $this->loadLaravelMigrations();
     }

@@ -2,15 +2,13 @@
 
 namespace Beebmx\LaravelPay\Tests\Fixtures;
 
-use Beebmx\LaravelPay\Database\Factories\UserFactory;
-use Beebmx\LaravelPay\Payable;
+use Beebmx\LaravelPay\Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Model;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class Product extends Model
 {
-    use HasFactory, Notifiable, Payable;
+    use HasFactory;
 
     protected $guarded = [];
 
@@ -21,6 +19,6 @@ class User extends Model
      */
     protected static function newFactory()
     {
-        return UserFactory::new();
+        return ProductFactory::new();
     }
 }

@@ -46,6 +46,7 @@ class Transaction extends Model
                 'name' => $product->name,
                 'price' => $product->price,
                 'quantity' => $product->quantity,
+                'model_id' => $product->model,
             ]);
         });
 

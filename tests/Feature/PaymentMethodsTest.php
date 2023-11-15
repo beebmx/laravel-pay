@@ -1,88 +1,82 @@
 <?php
 
-namespace Beebmx\LaravelPay\Tests\Feature;
-
 use Beebmx\LaravelPay\Elements\PaymentMethod;
-use Beebmx\LaravelPay\Tests\FeatureTestCase;
 use Beebmx\LaravelPay\Tests\Fixtures\User;
 
-class PaymentMethodsTest extends FeatureTestCase
-{
-    /** @test */
-    public function a_customer_can_add_a_payment_method()
-    {
-        $user = User::factory()->create(['service_customer_id' => 'cus_0123456789']);
-        $paymentMethod = $user->addPaymentMethod('src_0123456789');
+test('a customer can add a payment method', function () {
+    $user = User::factory()->create(['service_customer_id' => 'cus_0123456789']);
+    $paymentMethod = $user->addPaymentMethod('src_0123456789');
 
-        $this->assertIsObject($paymentMethod);
-    }
+    expect($paymentMethod)
+        ->toBeObject();
+});
 
-    /** @test */
-    public function a_customer_has_a_default_a_payment_method_after_added_a_payment_method()
-    {
-        $user = User::factory()->create(['service_customer_id' => 'cus_0123456789']);
+test('a customer has a default a payment method after added a payment method', function () {
+    $user = User::factory()->create(['service_customer_id' => 'cus_0123456789']);
 
-        $this->assertFalse($user->hasDefaultPayment());
+    expect($user->hasDefaultPayment())->toBeFalse();
 
-        $paymentMethod = $user->addPaymentMethod('token_123');
-        $this->assertTrue($user->hasDefaultPayment());
-        $this->assertNotNull($user->service_payment_id);
-        $this->assertNotNull($user->service_payment_type);
-        $this->assertNotNull($user->service_payment_brand);
-        $this->assertNotNull($user->service_payment_last_four);
-        $this->assertEquals($paymentMethod->id, $user->service_payment_id);
-    }
+    $paymentMethod = $user->addPaymentMethod('token_123');
 
-    /** @test */
-    public function a_customer_can_find_a_payment_by_id()
-    {
-        $user = User::factory()->create(['service_customer_id' => 'cus_0123456789']);
+    expect($user->hasDefaultPayment())->toBeTrue()
+        ->and($user->service_payment_id)->not->toBeNull()
+        ->and($user->service_payment_type)->not->toBeNull()
+        ->and($user->service_payment_brand)->not->toBeNull()
+        ->and($user->service_payment_last_four)->not->toBeNull()
+        ->and($user->service_payment_id)->toEqual($paymentMethod->id);
+});
 
-        $this->assertNotNull($user->findPaymentMethod('src_987654310'));
-        $this->assertIsObject($user->findPaymentMethod('src_987654310'));
-        $this->assertInstanceOf(PaymentMethod::class, $user->findPaymentMethod('src_987654310'));
-        $this->assertEquals('src_987654310', $user->findPaymentMethod('src_987654310')->id);
-    }
+test('a customer can find a payment by id', function () {
+    $user = User::factory()->create(['service_customer_id' => 'cus_0123456789']);
 
-    /** @test */
-    public function a_customer_can_retrive_their_default_payment_method()
-    {
-        $user = User::factory()->create(['service_customer_id' => 'cus_0123456789']);
-        $this->assertNull($user->getDefaultPayment());
+    expect($user->findPaymentMethod('src_987654310'))
+        ->not->toBeNull()
+        ->toBeObject()
+        ->toBeInstanceOf(PaymentMethod::class)
+        ->and($user->findPaymentMethod('src_987654310')->id)->toEqual('src_987654310');
+});
 
-        $user = User::factory()->create(['service_customer_id' => 'cus_0123456789', 'service_payment_id' => 'src_0123456789']);
-        $this->assertNotNull($user->getDefaultPayment());
-        $this->assertIsObject($user->getDefaultPayment());
-        $this->assertEquals('src_0123456789', $user->findPaymentMethod('src_0123456789')->id);
-    }
+test('a customer can retrive their default payment method', function () {
+    $user = User::factory()->create(['service_customer_id' => 'cus_0123456789']);
+    expect($user->getDefaultPayment())
+        ->toBeNull();
 
-    /** @test */
-    public function a_one_time_payment_method_exists_or_not()
-    {
-        $user = User::factory()->create();
-        $this->assertFalse($user->hasOneTimePaymentMethod());
+    $user = User::factory()->create(['service_customer_id' => 'cus_0123456789', 'service_payment_id' => 'src_0123456789']);
 
-        $user->token('token_123');
-        $this->assertTrue($user->hasOneTimePaymentMethod());
-    }
+    expect($user->getDefaultPayment())
+        ->not->toBeNull()
+        ->toBeObject()
+        ->and($user->findPaymentMethod('src_0123456789')->id)->toEqual('src_0123456789');
+});
 
-    /** @test */
-    public function an_one_time_token_payment_method_is_returned_if_exists()
-    {
-        $user = User::factory()->create();
-        $this->assertNull($user->getOneTimeTokenPaymentMethod());
+test('a one time payment method exists or not', function () {
+    $user = User::factory()->create();
+    expect($user->hasOneTimePaymentMethod())
+        ->toBeFalse();
 
-        $user->token('token_123');
-        $this->assertInstanceOf(PaymentMethod::class, $user->getOneTimeTokenPaymentMethod());
-    }
+    $user->token('token_123');
+    expect($user->hasOneTimePaymentMethod())
+        ->toBeTrue();
+});
 
-    /** @test */
-    public function an_oxxo_payment_method_is_returned_if_exists()
-    {
-        $user = User::factory()->create();
-        $this->assertNull($user->getOxxoPaymentMethod());
+test('an one time token payment method is returned if exists', function () {
+    $user = User::factory()->create();
+    expect($user->getOneTimeTokenPaymentMethod())
+        ->toBeNull();
 
-        $user->oxxo();
-        $this->assertInstanceOf(PaymentMethod::class, $user->getOxxoPaymentMethod());
-    }
-}
+    $user->token('token_123');
+
+    expect($user->getOneTimeTokenPaymentMethod())
+        ->toBeInstanceOf(PaymentMethod::class);
+});
+
+test('an oxxo payment method is returned if exists', function () {
+    $user = User::factory()->create();
+    expect($user->getOxxoPaymentMethod())
+        ->toBeNull();
+
+    $user->oxxo();
+
+    expect($user->getOxxoPaymentMethod())
+        ->toBeInstanceOf(PaymentMethod::class);
+});

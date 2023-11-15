@@ -1,63 +1,44 @@
 <?php
 
-namespace Beebmx\LaravelPay\Tests\Feature;
-
 use Beebmx\LaravelPay\Events\WebhookHandled;
 use Beebmx\LaravelPay\Events\WebhookReceived;
 use Beebmx\LaravelPay\Pay;
-use Beebmx\LaravelPay\Tests\FeatureTestCase;
 use Illuminate\Support\Facades\Event;
 
-class WebhooksEventTest extends FeatureTestCase
-{
-    /** @test */
-    public function a_webhook_always_dispatch_webhook_received()
-    {
-        Event::fake([WebhookReceived::class]);
+beforeEach(function () {
+    config(['app.url' => 'http://laravel-pay.test']);
+});
 
-        $request = $this->request(Pay::getWebhookspath());
-        app()->handle($request);
+test('a webhook always dispatch webhook received', function () {
+    Event::fake([WebhookReceived::class]);
 
-        Event::assertDispatched(WebhookReceived::class);
-    }
+    $request = $this->request(Pay::getWebhookspath());
+    app()->handle($request);
 
-    /** @test */
-    public function a_webhook_not_dispatch_webhook_handled_if_its_not_handled()
-    {
-        Event::fake([WebhookHandled::class]);
+    Event::assertDispatched(WebhookReceived::class);
+});
 
-        $this->assertEquals('sandbox', config('pay.default'));
+test('a webhook not dispatch webhook handled if its not handled', function () {
+    Event::fake([WebhookHandled::class]);
 
-        $request = $this->request(Pay::getWebhookspath());
-        app()->handle($request);
+    expect(config('pay.default'))
+        ->toEqual('sandbox');
 
-        Event::assertNotDispatched(WebhookHandled::class);
-    }
+    $request = $this->request(Pay::getWebhookspath());
+    app()->handle($request);
 
-    /**
-     * @test
-     *
-     * @define-env useConektaDriver
-     */
-    public function a_webhook_dispatch_webhook_handled_if_its_handled()
-    {
-        Event::fake([WebhookHandled::class]);
+    Event::assertNotDispatched(WebhookHandled::class);
+});
 
-        $this->assertEquals('conekta', config('pay.default'));
+test('a webhook dispatch webhook handled if its handled', function () {
+    config(['pay.default' => 'conekta']);
+    Event::fake([WebhookHandled::class]);
 
-        $request = $this->request(Pay::getWebhookspath(), ['id' => 'ord_0123456789', 'type' => 'order.paid', 'data' => ['object' => ['status' => 'paid']]]);
-        app()->handle($request);
+    expect(config('pay.default'))
+        ->toEqual('conekta');
 
-        Event::assertDispatched(WebhookHandled::class);
-    }
+    $request = $this->request(Pay::getWebhookspath(), ['id' => 'ord_0123456789', 'type' => 'order.paid', 'data' => ['object' => ['status' => 'paid']]]);
+    app()->handle($request);
 
-    protected function useConektaDriver($app)
-    {
-        $app['config']->set('pay.default', 'conekta');
-    }
-
-    protected function defineEnvironment($app)
-    {
-        $app['config']->set('app.url', 'http://laravel-pay.test');
-    }
-}
+    Event::assertDispatched(WebhookHandled::class);
+});

@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transaction_items', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transaction_id');
-            $table->unsignedBigInteger('model_id')->nullable();
             $table->string('name');
-            $table->string('price');
-            $table->integer('quantity');
+            $table->double('price', 8, 2)->default(0.0);
+            $table->integer('stock')->default(0);
+            $table->string('sku')->nullable();
+            $table->string('barcode')->nullable();
             $table->timestamps();
         });
     }

@@ -6,13 +6,13 @@ use Exception;
 
 class InvalidPayment extends Exception
 {
-    public static function product(): static
+    public static function purchase(): static
     {
-        return new static('The payment requires at least 1 product.');
+        return new static('The payment requires at least 1 purchase.');
     }
 
-    public static function price(array $product): static
+    public static function price(array $purchase): static
     {
-        return new static("The product {$product['name']} requires prices.");
+        return new static("The purchase {$purchase['name']} requires prices.");
     }
 }

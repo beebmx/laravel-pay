@@ -2,6 +2,12 @@
 
 All notable changes to `Payments for Laravel` will be documented in this file.
 
+## 0.7.0 - 2023-11-15
+
+- Added the posibility to include a model to every transaction item
+- Change PHPUnit to Pest
+- Change Product to Purchase internals
+
 ## 0.6.1 - 2023-11-15
 
 - Update StripeDriver
